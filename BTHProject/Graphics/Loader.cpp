@@ -58,6 +58,20 @@ Mesh * Loader::createTerrainMesh(ParserData * data, std::vector<std::string> tex
 	return mesh;
 }
 
+Mesh * Loader::createTerrainMesh(ParserData * data, std::vector<GLuint> textureIDs)
+{
+	GLuint VAO = createAndBindVAO();
+	bindIndices(data->getIndices());
+	storeDataInAttributeList(0, 3, data->getVertices());
+	storeDataInAttributeList(1, 3, data->getNormals());
+	storeDataInAttributeList(2, 2, data->getUvs());
+	unbindVAO();
+
+	Mesh* mesh = new Mesh(VAO, textureIDs, data->getAmbientColor(), data->getDiffuseColor(), data->getSpecularColor(), data->getShininess(), (GLuint)data->getIndices().size());
+	MeshMemoryCollector::registerMesh(mesh);
+	return mesh;
+}
+
 InstancedMesh * Loader::createInstancedMesh(ParserData * data)
 {
 	GLuint VAO = createAndBindVAO();
@@ -116,6 +130,41 @@ GLuint Loader::createTexture(std::string filename)
 
 	return textureID;
 
+}
+
+std::vector<GLuint> Loader::createTexture(std::vector<std::string> textureNames)
+{
+	std::vector<GLuint> ids;
+	for (int i = 0; i < textureNames.size(); i++) {
+
+		GLint width, height, channels;
+		GLuint textureID;
+		stbi_set_flip_vertically_on_load(1);
+		unsigned char* textureData = stbi_load(textureNames[i].c_str(), &width, &height, &channels, STBI_rgb);
+
+		if (!textureData)
+		{
+			printf("Failed to load texture %s\n", textureNames[i].c_str());
+			return ids;
+		}
+
+		glGenTextures(1, &textureID);
+		glBindTexture(GL_TEXTURE_2D, textureID);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, NULL);
+		stbi_image_free(textureData);
+		m_texIDs.emplace_back(&textureID);
+		ids.emplace_back(textureID);
+
+	}
+	return ids;
 }
 
 void Loader::bindIndices(const std::vector<GLuint>& indices)

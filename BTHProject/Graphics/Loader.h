@@ -14,11 +14,13 @@ public:
 
 	Mesh* createMesh(ParserData* data);
 	Mesh* createTerrainMesh(ParserData* data, std::vector<std::string> textureNames);
+	Mesh* createTerrainMesh(ParserData* data, std::vector<GLuint> textureIDs);
+	GLuint createTexture(std::string filename);
+	std::vector<GLuint> createTexture(std::vector<std::string> textureNames);
 	InstancedMesh* createInstancedMesh(ParserData* data);
 
 private:
 	GLuint createAndBindVAO();
-	GLuint createTexture(std::string filename);
 	void bindIndices(const std::vector<GLuint>& indices);
 	void storeDataInAttributeList(const GLuint& attributeNumber, const GLuint& dataPerVertex, const std::vector<GLfloat>& data);
 	GLuint createEmptyModelMatrixBuffer(const GLuint& attributeNumber);

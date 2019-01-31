@@ -65,8 +65,6 @@ void RegularRenderer::bindMesh(Mesh * mesh, const FPSCamera* camera)
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 
-	m_meshShader->setCameraPosition(camera->getPosition());
-
 	for (int i = 0; i < mesh->getTexIDs().size(); i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);

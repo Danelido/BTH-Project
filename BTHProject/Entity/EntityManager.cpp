@@ -6,7 +6,6 @@ EntityManager::EntityManager()
 {
 	m_entities.reserve(1000);
 	m_processedEntities = 0;
-	m_maxProcessingDistance = 20.f;
 }
 
 EntityManager::~EntityManager()
@@ -33,24 +32,40 @@ void EntityManager::add(InstancedMesh * instancedMesh, const glm::vec3 & positio
 	m_entities.emplace_back(new Entity(instancedMesh, position, scale, rotation));
 }
 
-void EntityManager::update(float dt, const FPSCamera* camera, MasterRenderer* masterRenderer)
+void EntityManager::registerQuadtree(QuadTree * quadtree)
+{
+	m_quadtree = quadtree;
+}
+
+void EntityManager::update(float dt, const FPSCamera* camera, MasterRenderer* masterRenderer, std::vector<QuadTreeObject*>& objects)
 {
 	m_processedEntities = 0;
-	for (size_t i = 0; i < m_entities.size(); i++)
-	{	
-		float distance = glm::distance(camera->getPosition(), m_entities[i]->getPosition());
-		if (distance < m_maxProcessingDistance)
+	
+	if (m_quadtree != nullptr && !m_ignoreQuadTree)
+	{
+		for (size_t i = 0; i < objects.size(); i++)
+		{
+			if (objects[i]->getEntity() != nullptr) {
+				masterRenderer->submitEntity(objects[i]->getEntity());
+				m_processedEntities++;
+			}
+		}
+
+	}
+	else
+	{
+		for (size_t i = 0; i < m_entities.size(); i++)
 		{
 			masterRenderer->submitEntity(m_entities[i]);
 			m_processedEntities++;
 		}
-
 	}
+
 }
 
-void EntityManager::setMaxProcessingDistance(float distance)
+void EntityManager::setIgnoreQuadTree(bool b)
 {
-	m_maxProcessingDistance = distance;
+	m_ignoreQuadTree = b;
 }
 
 const unsigned int & EntityManager::entitiesProcessed() const

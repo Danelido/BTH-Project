@@ -82,7 +82,7 @@ void Application::run()
 {
 	m_deltaArraySize = 0;
 	m_FilledArray = false;
-	m_maxDeltaSamples = 20;
+	m_maxDeltaSamples = 10;
 	while (!glfwWindowShouldClose(m_window)) 
 	{
 		m_input->clearKeys();
@@ -112,7 +112,7 @@ void Application::run()
 void Application::smoothDelta()
 {
 	m_currentTime = glfwGetTime();
-	float dt = m_currentTime - m_lastTime;
+	double dt = m_currentTime - m_lastTime;
 	m_lastTime = m_currentTime;
 
 	if (m_deltaArraySize % m_deltaArray.size() == 0)
@@ -130,7 +130,7 @@ void Application::smoothDelta()
 		{
 			m_deltaTime += m_deltaArray[i];
 		}
-		m_deltaTime /= (float)m_deltaArraySize;
+		m_deltaTime /= (double)m_deltaArraySize;
 	}
 	else
 	{
@@ -138,7 +138,7 @@ void Application::smoothDelta()
 		{
 			m_deltaTime += m_deltaArray[i];
 		}
-		m_deltaTime /= (float)(m_deltaArray.size());
+		m_deltaTime /= (double)(m_deltaArray.size());
 	}
 
 }

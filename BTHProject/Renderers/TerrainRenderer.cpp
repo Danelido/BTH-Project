@@ -7,7 +7,7 @@ TerrainRenderer::TerrainRenderer(const glm::mat4 & projectionMatrix)
 	m_terrainShader->setProjectionMatrix(projectionMatrix);
 	m_terrainShader->unuse();
 
-	m_terrains.reserve(100);
+	m_chunks.reserve(5000);
 }
 
 TerrainRenderer::~TerrainRenderer()
@@ -15,44 +15,46 @@ TerrainRenderer::~TerrainRenderer()
 	delete m_terrainShader;
 }
 
-void TerrainRenderer::submit(Terrain * terrain)
+void TerrainRenderer::submit(TerrainChunk * terrain)
 {
-	m_terrains.emplace_back(terrain);
+	m_chunks.emplace_back(terrain);
 }
 
 void TerrainRenderer::render(const FPSCamera * camera)
 {
-	m_terrainShader->use();
+	if (m_chunks.size() == 0)
+		return; 
 
-	for (size_t i = 0; i < m_terrains.size(); i++)
+	m_terrainShader->use();
+	m_terrainShader->setCameraPosition(camera->getPosition());
+	m_terrainShader->setModelMatrix(glm::mat4(1.f));
+	m_terrainShader->setViewMatrix(camera->getViewMatrix());
+
+
+	for (int i = 0; i < m_chunks[0]->getMesh()->getTexIDs().size(); i++)
 	{
-		bindMesh(m_terrains[i], camera);
-		glDrawElements(GL_TRIANGLES, m_terrains[i]->getTerrainMesh()->getIndicesSize(), GL_UNSIGNED_INT, NULL);
-		unbindMesh();
+		glActiveTexture(GL_TEXTURE3 + i);
+		glBindTexture(GL_TEXTURE_2D, m_chunks[0]->getMesh()->getTexIDs()[i]);
+
 	}
 
+	for (size_t j = 0; j < m_chunks.size(); j++) {
+		bindMesh(m_chunks[j], camera);
+		glDrawElements(GL_TRIANGLES, m_chunks[j]->getMesh()->getIndicesSize(), GL_UNSIGNED_INT, NULL);
+		unbindMesh();
+	}
+	
 	m_terrainShader->unuse();
+
+	m_chunks.clear();
 }
 
-void TerrainRenderer::bindMesh(Terrain * terrain, const FPSCamera * camera)
+void TerrainRenderer::bindMesh(TerrainChunk * chunk, const FPSCamera * camera)
 {
-	glBindVertexArray(terrain->getTerrainMesh()->getVao());
-
+	glBindVertexArray(chunk->getMesh()->getVao());
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
-	
-	m_terrainShader->setCameraPosition(camera->getPosition());
-	m_terrainShader->setModelMatrix(terrain->getModelMatrix());
-	m_terrainShader->setViewMatrix(camera->getViewMatrix());
-
-	
-	for (int i = 0; i < terrain->getTerrainMesh()->getTexIDs().size(); i++)
-	{
-		glActiveTexture(GL_TEXTURE3 + i);
-		glBindTexture(GL_TEXTURE_2D, terrain->getTerrainMesh()->getTexIDs()[i]);
-		
-	}
 }
 
 

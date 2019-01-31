@@ -167,13 +167,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Acceleration\QuadTree.cpp" />
+    <ClCompile Include="Acceleration\QuadTreeObject.cpp" />
     <ClCompile Include="App\AppSettings.cpp" />
     <ClCompile Include="Entity\Entity.cpp" />
     <ClCompile Include="Entity\EntityManager.cpp" />
     <ClCompile Include="Graphics\FBO.cpp" />
     <ClCompile Include="Renderers\TerrainRenderer.cpp" />
     <ClCompile Include="Shader\FBOShader.cpp" />
+    <ClCompile Include="Shader\QuadTreeDebugShader.cpp" />
     <ClCompile Include="Shader\TerrainShader.cpp" />
+    <ClCompile Include="Terrain\TerrainChunk.cpp" />
+    <ClCompile Include="Terrain\TerrainChunkManager.cpp" />
+    <ClCompile Include="Utility\Camera.cpp" />
     <ClCompile Include="Utility\FPSCamera.cpp" />
     <ClCompile Include="Utility\Input.cpp" />
     <ClCompile Include="Meshes\InstancedMesh.cpp" />
@@ -213,13 +219,20 @@
     <ClCompile Include="Vendor\ImGui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Acceleration\DataStructs.h" />
+    <ClInclude Include="Acceleration\QuadTree.h" />
+    <ClInclude Include="Acceleration\QuadTreeObject.h" />
     <ClInclude Include="App\AppSettings.h" />
     <ClInclude Include="Entity\Entity.h" />
     <ClInclude Include="Entity\EntityManager.h" />
     <ClInclude Include="Graphics\FBO.h" />
     <ClInclude Include="Renderers\TerrainRenderer.h" />
     <ClInclude Include="Shader\FBOShader.h" />
+    <ClInclude Include="Shader\QuadTreeDebugShader.h" />
     <ClInclude Include="Shader\TerrainShader.h" />
+    <ClInclude Include="Terrain\TerrainChunk.h" />
+    <ClInclude Include="Terrain\TerrainChunkManager.h" />
+    <ClInclude Include="Utility\Camera.h" />
     <ClInclude Include="Utility\FPSCamera.h" />
     <ClInclude Include="Utility\Input.h" />
     <ClInclude Include="Meshes\InstancedMesh.h" />
@@ -258,6 +271,8 @@
     <None Include="Resources\Shaders\FBO.vert" />
     <None Include="Resources\Shaders\InstancedMesh.frag" />
     <None Include="Resources\Shaders\InstancedMesh.vert" />
+    <None Include="Resources\Shaders\QuadTreeDebug.frag" />
+    <None Include="Resources\Shaders\QuadTreeDebug.vert" />
     <None Include="Resources\Shaders\TerrainShader.frag" />
     <None Include="Resources\Shaders\TerrainShader.vert" />
   </ItemGroup>

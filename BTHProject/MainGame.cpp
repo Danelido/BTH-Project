@@ -10,23 +10,48 @@ MainGame::MainGame()
 {
 	m_parser = new Parser();
 	m_loader = new Loader();
-	m_fpsCamera = new FPSCamera(glm::vec3(55.0f, 10.0f, 50.f));
-	m_MasterRenderer = new MasterRenderer(m_fpsCamera);
+	m_fpsCamera = new FPSCamera(glm::vec3(128.0f, 15.0f, 128.f));
+	m_fpsCamera->initDebugMode();
+	m_dbgCamera = new FPSCamera(glm::vec3(128.0f, 15.0f, 128.f));
+	m_dbgCameraActive = false;
+	m_activeCamera = m_fpsCamera;
+	m_masterRenderer = new MasterRenderer(m_activeCamera);
 	m_entityManager = new EntityManager();
-	m_temp_processingDistance = 250.f;
+	m_terrainChunkManager = new TerrainChunkManager();
 	m_vSync = true;
 	m_terrainWalk = false;
-	m_gravity = -.250f;
-	m_entityManager->setMaxProcessingDistance(m_temp_processingDistance);
+	m_gravity = -20.f;
 	m_upAcceleration = 0.f;
-	m_jumpForce = .150f;
+	m_jumpForce = 9.0f;
 	m_canJump = true;
+	m_ignoreQuadtree = false;
+	
+	spawnObjects();
+	
+	m_entityManager->registerQuadtree(m_quadTree);
+	m_masterRenderer->registerQuadTree(m_quadTree);
+}
+
+MainGame::~MainGame()
+{
+	delete m_parser;
+	delete m_loader;
+	delete m_masterRenderer;
+	delete m_fpsCamera;
+	delete m_entityManager;
+	delete m_terrain;
+	delete m_quadTree;
+	delete m_dbgCamera;
+	delete m_terrainChunkManager;
+}
+
+void MainGame::spawnObjects()
+{
+	// Parse some data
 	ParserData* boxData = m_parser->parseFile("Resources/Models/box.obj");
 	ParserData* treeData = m_parser->parseFile("Resources/Models/tree.obj");
-	
-	m_terrain = new Terrain(m_loader);
-	m_MasterRenderer->submitTerrain(m_terrain);
 
+	// Choose if the entities is rendered with instancing or just regular ( 1 draw call per object )
 #define instanced 1
 #if instanced
 	InstancedMesh* m_treeMesh = m_loader->createInstancedMesh(treeData);
@@ -34,53 +59,65 @@ MainGame::MainGame()
 	Mesh* m_treeMesh = m_loader->createMesh(treeData);
 #endif
 
+	// Mesh for the sun
 	Mesh* boxMesh = m_loader->createMesh(boxData);
+
+	// Setup a sun ( Visualized with a box )
 	m_sun = new Entity(boxMesh, glm::vec3(-1.f, 10.f, -1.f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 0.f));
-	m_entityManager->add(m_sun);
 	m_sunMoveSpeed = 10.f;
+	m_entityManager->add(m_sun);
 
+	// Setup quadTree and terrain
+	XZ p(128.f, 128.f);
+	AABB boundary(p, 128.f);
+	m_quadTree = new QuadTree(boundary, m_fpsCamera);
+	m_terrain = new Terrain(m_loader, m_terrainChunkManager, m_quadTree);
 
-	float maxDist = 251.f;
-	for (int i = 0; i < 200; i++)
+	float maxDist = 251;
+
+	// Entities
+	for (int i = 0; i < 10000; i++)
 	{
 		float x = RandomNum::single(5.f, maxDist);
 		float z = RandomNum::single(5.f, maxDist);
 		float y = m_terrain->getHeight(glm::vec3(x, 0.f, z));
+		//float y = 0.f;
+		Entity* entity = new Entity(m_treeMesh,
+			glm::vec3(x, y - 0.5f, z),
+			glm::vec3(0.2f, 0.2f, 0.2f),
+			glm::vec3(0.f, 0.f, 0.f));
 
-		m_entityManager->add(m_treeMesh,
-			glm::vec3(x,y - 1.5f,z),
-			glm::vec3(2.f, 2.f, 2.f));
-
+		m_entityManager->add(entity);
+		m_quadTree->insert(entity);
 	}
 
-	for (int i = 0; i < 25; i++)
+	//Lights
+	/*for (int i = 0; i < AppSettings::MAXLIGHTS(); i++)
 	{
-		m_MasterRenderer->submitLight(new Light(
+		m_masterRenderer->submitLight(new Light(
 			RandomNum::vec3(0.f, maxDist, 10.f, 10.f, 0.f, maxDist),
-			RandomNum::vec3(0.f, 255.f, 0.f, 255.f, 0.f, 255.f) / 255.f ));
-	}
+			RandomNum::vec3(0.f, 255.f, 0.f, 255.f, 0.f, 255.f) / 255.f));
+	}*/
 
-	glfwSwapInterval(1);
-}
-
-MainGame::~MainGame()
-{
-	delete m_parser;
-	delete m_loader;
-	delete m_MasterRenderer;
-	delete m_fpsCamera;
-	delete m_entityManager;
-	delete m_terrain;
 }
 
 void MainGame::update(float dt)
 {
-	m_fpsCamera->setFreeLook(!m_terrainWalk);
-	m_fpsCamera->update(dt);
-	if(m_fpsCamera->isActive())
+	if (m_dbgCameraActive){
+		m_activeCamera = m_dbgCamera;
+	}
+	else{
+		m_activeCamera = m_fpsCamera;
+	}
+	m_activeCamera->update(dt);
+	m_activeCamera->setFreeLook(!m_terrainWalk);
+
+	if (m_activeCamera->isActive())
 		jumpFunc(dt);
-	m_entityManager->setMaxProcessingDistance(m_temp_processingDistance);
-	m_entityManager->update(dt, m_fpsCamera, m_MasterRenderer);
+
+	m_masterRenderer->changeCamera(m_activeCamera);
+
+	queryTreeAndUpdateManagers(dt);
 	moveSunFunc(dt);
 
 	if(m_vSync)
@@ -91,7 +128,7 @@ void MainGame::update(float dt)
 
 void MainGame::render()
 {
-	m_MasterRenderer->render();
+	m_masterRenderer->render();
 }
 
 void MainGame::renderImGUI(float dt)
@@ -101,20 +138,32 @@ void MainGame::renderImGUI(float dt)
 	ImGui::Text("WASD = Move around");
 	ImGui::Text("Space & CTRL = Move Up/Down");
 	ImGui::Text("Average deltaT: %f", dt);
-	ImGui::SliderFloat("Entity processing", &m_temp_processingDistance, 0.f, 1000.f);
 	ImGui::Text("Entities processed: %i", m_entityManager->entitiesProcessed());
-	ImGui::Text("Number of lights: %i", m_MasterRenderer->getNumberOfLights());
+	ImGui::Text("Number of lights: %i", m_masterRenderer->getNumberOfLights());
 	ImGui::Text("Position: (%f, %f, %f)", m_fpsCamera->getPosition().x, m_fpsCamera->getPosition().y, m_fpsCamera->getPosition().z);
+	ImGui::Text("Camera Up: (%f, %f, %f)", m_fpsCamera->getCameraUp().x, m_fpsCamera->getCameraUp().y, m_fpsCamera->getCameraUp().z);
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Checkbox("Vsync", &m_vSync);
 	ImGui::Checkbox("Terrain walking", &m_terrainWalk);
-	ImGui::SliderFloat("JumpForce", &m_jumpForce, 0.05f, 10.0f);
-	ImGui::SliderFloat("Gravity", &m_gravity, -10.f, 0.f);
+	ImGui::Checkbox("Switch to dbg camera", &m_dbgCameraActive);
+	ImGui::Checkbox("Ignore quadtree", &m_ignoreQuadtree);
+	ImGui::SliderFloat("JumpForce", &m_jumpForce, 0.00f, 20.0f);
+	ImGui::SliderFloat("Gravity", &m_gravity, -20.f, 0.f);
 	
-
 	ImGui::End();
 
 	ImGui::Render();
+}
+
+void MainGame::queryTreeAndUpdateManagers(float dt)
+{
+	std::vector<QuadTreeObject*> objects = m_quadTree->query();
+
+	m_entityManager->setIgnoreQuadTree(m_ignoreQuadtree);
+	m_terrainChunkManager->setIgnoreQuadTree(m_ignoreQuadtree);
+
+	m_entityManager->update(dt, m_activeCamera, m_masterRenderer, objects);
+	m_terrainChunkManager->updateChunks(m_masterRenderer, objects);
 }
 
 void MainGame::jumpFunc(float dt)
@@ -122,9 +171,9 @@ void MainGame::jumpFunc(float dt)
 	if (m_terrainWalk)
 	{
 		float cameraY = m_fpsCamera->getPosition().y;
-		float targetY = m_terrain->getHeight(m_fpsCamera->getPosition());
+		float targetY = m_terrain->getHeight(m_fpsCamera->getPosition()) + 2.f;
 
-		cameraY += m_upAcceleration;
+		cameraY += m_upAcceleration * dt;
 		m_fpsCamera->setY(cameraY);
 		m_upAcceleration += m_gravity * dt;
 
@@ -136,9 +185,9 @@ void MainGame::jumpFunc(float dt)
 	}
 	else
 	{
-
 		m_canJump = false;
 	}
+
 	if (Input::isKeyPressed(GLFW_KEY_SPACE) && m_canJump)
 	{
 		m_canJump = false;
@@ -180,6 +229,7 @@ void MainGame::moveSunFunc(float dt)
 	}
 
 	m_sun->setPosition(pos);
-	m_MasterRenderer->setSunPosition(pos);
+	m_masterRenderer->setSunPosition(pos);
 
 }
+

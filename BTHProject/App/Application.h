@@ -18,12 +18,12 @@ public:
 	bool createWindow(std::string title, int width, int height);
 	void run();
 private:
-	float m_currentTime;
-	float m_deltaTime;
-	float m_lastTime;
+	double m_currentTime;
+	double m_deltaTime;
+	double m_lastTime;
 	int m_deltaArraySize;
 	int m_maxDeltaSamples;
-	std::array<float, 50> m_deltaArray;
+	std::array<double, 10> m_deltaArray;
 	void smoothDelta();
 	bool m_FilledArray;
 private:

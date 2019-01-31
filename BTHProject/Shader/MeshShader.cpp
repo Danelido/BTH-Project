@@ -11,17 +11,11 @@ MeshShader::MeshShader()
 	m_modelMatrixLocation = glGetUniformLocation(program(), "modelMatrix");
 	m_viewMatrixLocation = glGetUniformLocation(program(), "viewMatrix");
 	m_projectionMatrixLocation = glGetUniformLocation(program(), "projectionMatrix");
-	m_cameraPositionLocation = glGetUniformLocation(program(), "cameraPos");
 	unuse();
 }
 
 MeshShader::~MeshShader()
 {
-}
-
-void MeshShader::setCameraPosition(const glm::vec3& position)
-{
-	glUniform3f(m_cameraPositionLocation, position.x, position.y, position.z);
 }
 
 void MeshShader::setModelMatrix(const glm::mat4 & model)

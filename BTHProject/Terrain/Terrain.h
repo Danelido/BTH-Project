@@ -3,6 +3,9 @@
 #include "Parser/ParserData.h"
 #include "Graphics/Loader.h"
 #include <GLM/glm.hpp>
+#include "Acceleration/QuadTree.h"
+#include "TerrainChunk.h"
+#include "TerrainChunkManager.h"
 
 class Terrain
 {
@@ -13,8 +16,7 @@ public:
 	};
 
 public:
-	Terrain(Loader* loader);
-	Mesh* getTerrainMesh();
+	Terrain(Loader* loader, TerrainChunkManager* chunkManager, QuadTree* quadtree);
 	float getHeight(const glm::vec3& position);
 	const glm::mat4& getModelMatrix() const;
 	~Terrain();
@@ -24,18 +26,22 @@ private:
 	glm::vec3 calculateNormals(TerrainData v1, TerrainData v2, TerrainData v3);
 	void smoothNormals();
 	void generateTerrain();
+	void generateTerrainCells(int nodeX, int nodeY, int cellWidth, int cellHeight, std::vector<GLuint> textureIDs);
 private:
-	bool m_loadedSuccessful;
 	Loader* m_loader;
-	Mesh* m_terrainMesh;
+	QuadTree* m_quadTree;
 	ParserData* m_data;
+	TerrainChunkManager* m_chunkManager;
+	TerrainData* m_heightmapCoords;
 
 	unsigned int m_terrainWidth;
 	unsigned int m_terrainHeight;
+	
 	float m_size;
 	float m_heightScaleDivider;
 
-	TerrainData* m_heightmapCoords;
+	bool m_loadedSuccessful;
+	
 	glm::mat4 m_modelMatrix;
 
 };

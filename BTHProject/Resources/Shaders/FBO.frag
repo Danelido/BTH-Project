@@ -30,7 +30,7 @@ void main()
 	float specular = texture(gAlbedoSpec,frag_uv).a; 
 
 	// Ambient color
-	float ambientFactor = 0.05f;
+	float ambientFactor = 0.15f;
 	vec3 ambient = vec3(1.f) * ambientFactor;
 	vec4 currentColor = vec4(ambient,1.0f);
 
