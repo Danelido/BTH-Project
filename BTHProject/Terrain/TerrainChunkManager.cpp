@@ -24,12 +24,10 @@ void TerrainChunkManager::updateChunks(MasterRenderer * renderer, std::vector<Qu
 	}
 	else if (m_ignoreQuadTree)
 	{
-		for (size_t i = 0; i < objects.size(); i++)
+		for (size_t i = 0; i < m_chunks.size(); i++)
 		{
-			if (objects[i]->getChunk() != nullptr) {
-				renderer->submitTerrain(objects[i]->getChunk());
-				m_processedChunks++;
-			}
+			renderer->submitTerrain(m_chunks[i]);
+			m_processedChunks++;
 		}
 	}
 }

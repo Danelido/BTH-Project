@@ -18,6 +18,8 @@ MainGame::MainGame()
 	m_masterRenderer = new MasterRenderer(m_activeCamera);
 	m_entityManager = new EntityManager();
 	m_terrainChunkManager = new TerrainChunkManager();
+	m_lightManager = new LightManager();
+	m_lightManager->reserveVectorMemory(AppSettings::MAXLIGHTS());
 	m_vSync = true;
 	m_terrainWalk = false;
 	m_gravity = -20.f;
@@ -43,6 +45,7 @@ MainGame::~MainGame()
 	delete m_quadTree;
 	delete m_dbgCamera;
 	delete m_terrainChunkManager;
+	delete m_lightManager;
 }
 
 void MainGame::spawnObjects()
@@ -68,7 +71,7 @@ void MainGame::spawnObjects()
 	m_entityManager->add(m_sun);
 
 	// Setup quadTree and terrain
-	XZ p(128.f, 128.f);
+	XYZ p(128.f, 12.f, 128.f);
 	AABB boundary(p, 128.f);
 	m_quadTree = new QuadTree(boundary, m_fpsCamera);
 	m_terrain = new Terrain(m_loader, m_terrainChunkManager, m_quadTree);
@@ -76,7 +79,7 @@ void MainGame::spawnObjects()
 	float maxDist = 251;
 
 	// Entities
-	for (int i = 0; i < 10000; i++)
+	for (int i = 0; i < 1000; i++)
 	{
 		float x = RandomNum::single(5.f, maxDist);
 		float z = RandomNum::single(5.f, maxDist);
@@ -84,7 +87,7 @@ void MainGame::spawnObjects()
 		//float y = 0.f;
 		Entity* entity = new Entity(m_treeMesh,
 			glm::vec3(x, y - 0.5f, z),
-			glm::vec3(0.2f, 0.2f, 0.2f),
+			glm::vec3(1.f, 1.f, 1.f),
 			glm::vec3(0.f, 0.f, 0.f));
 
 		m_entityManager->add(entity);
@@ -92,12 +95,20 @@ void MainGame::spawnObjects()
 	}
 
 	//Lights
-	/*for (int i = 0; i < AppSettings::MAXLIGHTS(); i++)
+	for (int i = 0; i < AppSettings::MAXLIGHTS(); i++)
 	{
-		m_masterRenderer->submitLight(new Light(
-			RandomNum::vec3(0.f, maxDist, 10.f, 10.f, 0.f, maxDist),
-			RandomNum::vec3(0.f, 255.f, 0.f, 255.f, 0.f, 255.f) / 255.f));
-	}*/
+		float x = RandomNum::single(5.f, maxDist);
+		float z = RandomNum::single(5.f, maxDist);
+		float y = m_terrain->getHeight(glm::vec3(x, 0.f, z)) + 3.f;
+
+		Light* light = new Light(
+			glm::vec3(x,y,z),
+			RandomNum::vec3(0.f, 255.f, 0.f, 255.f, 0.f, 255.f) / 255.f,
+			10.f);
+
+		m_lightManager->addLight(light);
+		m_quadTree->insert(light);
+	}
 
 }
 
@@ -139,7 +150,7 @@ void MainGame::renderImGUI(float dt)
 	ImGui::Text("Space & CTRL = Move Up/Down");
 	ImGui::Text("Average deltaT: %f", dt);
 	ImGui::Text("Entities processed: %i", m_entityManager->entitiesProcessed());
-	ImGui::Text("Number of lights: %i", m_masterRenderer->getNumberOfLights());
+	ImGui::Text("Number of lights: %i", m_lightManager->getNrOfLightsProcessed());
 	ImGui::Text("Position: (%f, %f, %f)", m_fpsCamera->getPosition().x, m_fpsCamera->getPosition().y, m_fpsCamera->getPosition().z);
 	ImGui::Text("Camera Up: (%f, %f, %f)", m_fpsCamera->getCameraUp().x, m_fpsCamera->getCameraUp().y, m_fpsCamera->getCameraUp().z);
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -161,9 +172,11 @@ void MainGame::queryTreeAndUpdateManagers(float dt)
 
 	m_entityManager->setIgnoreQuadTree(m_ignoreQuadtree);
 	m_terrainChunkManager->setIgnoreQuadTree(m_ignoreQuadtree);
+	m_lightManager->setIgnoreQuadTree(m_ignoreQuadtree);
 
 	m_entityManager->update(dt, m_activeCamera, m_masterRenderer, objects);
 	m_terrainChunkManager->updateChunks(m_masterRenderer, objects);
+	m_lightManager->update(m_masterRenderer, m_fpsCamera, objects);
 }
 
 void MainGame::jumpFunc(float dt)
@@ -200,7 +213,7 @@ void MainGame::moveSunFunc(float dt)
 {
 	glm::vec3 pos = m_sun->getPosition();
 	static float timer = 0.f;
-	timer += dt * 0.4f;
+	timer += dt * 0.2f;
 	pos.x = (cosf(timer) * 260.f + 260.f) / 2.f;
 	pos.z = (sinf(timer) * 260.f + 260.f) / 2.f;
 	pos.y = 30.f;

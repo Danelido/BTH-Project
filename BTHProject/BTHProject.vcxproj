@@ -172,6 +172,7 @@
     <ClCompile Include="App\AppSettings.cpp" />
     <ClCompile Include="Entity\Entity.cpp" />
     <ClCompile Include="Entity\EntityManager.cpp" />
+    <ClCompile Include="Light\LightManager.cpp" />
     <ClCompile Include="Graphics\FBO.cpp" />
     <ClCompile Include="Renderers\TerrainRenderer.cpp" />
     <ClCompile Include="Shader\FBOShader.cpp" />
@@ -185,7 +186,7 @@
     <ClCompile Include="Meshes\InstancedMesh.cpp" />
     <ClCompile Include="Shader\InstancedMeshShader.cpp" />
     <ClCompile Include="Renderers\InstancedRenderer.cpp" />
-    <ClCompile Include="Entity\Light.cpp" />
+    <ClCompile Include="Light\Light.cpp" />
     <ClCompile Include="Graphics\Loader.cpp" />
     <ClCompile Include="App\Main.cpp" />
     <ClCompile Include="MainGame.cpp" />
@@ -226,6 +227,7 @@
     <ClInclude Include="Entity\Entity.h" />
     <ClInclude Include="Entity\EntityManager.h" />
     <ClInclude Include="Graphics\FBO.h" />
+    <ClInclude Include="Light\LightManager.h" />
     <ClInclude Include="Renderers\TerrainRenderer.h" />
     <ClInclude Include="Shader\FBOShader.h" />
     <ClInclude Include="Shader\QuadTreeDebugShader.h" />
@@ -238,7 +240,7 @@
     <ClInclude Include="Meshes\InstancedMesh.h" />
     <ClInclude Include="Shader\InstancedMeshShader.h" />
     <ClInclude Include="Renderers\InstancedRenderer.h" />
-    <ClInclude Include="Entity\Light.h" />
+    <ClInclude Include="Light\Light.h" />
     <ClInclude Include="Graphics\Loader.h" />
     <ClInclude Include="MainGame.h" />
     <ClInclude Include="App\Application.h" />

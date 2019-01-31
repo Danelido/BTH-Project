@@ -5,7 +5,6 @@
 #include <vector>
 #include "Utility/FPSCamera.h"
 #include "Shader/InstancedMeshShader.h"
-#include "Entity/Light.h"
 
 #define MESH_VECTOR_RESERVE_SIZE 1000
 

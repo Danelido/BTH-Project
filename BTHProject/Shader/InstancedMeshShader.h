@@ -2,7 +2,6 @@
 #define _INSTANCED_MESH_SHADER_H
 #include "Shader.h"
 #include <GLM/glm.hpp>
-#include "Entity/Light.h"
 
 class InstancedMeshShader : public Shader
 {

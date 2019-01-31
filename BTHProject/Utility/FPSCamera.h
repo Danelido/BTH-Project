@@ -18,6 +18,7 @@ public:
 	void debugDraw();
 	void initDebugMode();
 	bool insideFrustum(AABB& aabb);
+	bool insideFrustum(const glm::vec3& pos, float radius);
 	const glm::mat4& getViewMatrix() const;
 	const glm::vec3& getPosition() const;
 	const glm::vec3& getCameraUp() const;

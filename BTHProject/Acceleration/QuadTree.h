@@ -18,6 +18,7 @@ public:
 
 	bool insert(Entity* entity);
 	bool insert(TerrainChunk* chunk);
+	bool insert(Light* light);
 	std::vector<QuadTreeObject*> query();
 	void draw(QuadTreeDebugShader* shader);
 private:

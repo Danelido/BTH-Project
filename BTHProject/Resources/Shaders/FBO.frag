@@ -11,9 +11,10 @@ struct Light
 {
 	vec3 position;
 	vec3 color;
+	float radius;
 };
 
-const int MAX_LIGHTS = 480;
+const int MAX_LIGHTS = 330;
 uniform int nrOfLights;
 uniform Light lights[MAX_LIGHTS];
 uniform vec3 cameraPos;
@@ -30,12 +31,10 @@ void main()
 	float specular = texture(gAlbedoSpec,frag_uv).a; 
 
 	// Ambient color
-	float ambientFactor = 0.15f;
+	float ambientFactor = 0.2f;
 	vec3 ambient = vec3(1.f) * ambientFactor;
 	vec4 currentColor = vec4(ambient,1.0f);
 
-	const float lightDistance = 10.f;
-	const float lightStart = 0.f;
 
 	// Sun
 		/* DIFFUSE */
@@ -53,14 +52,13 @@ void main()
 	for(int i = 0; i < nrOfLights; i++)
 	{
 		float dist = length((lights[i].position - position));
-		float strengthFactor = clamp((lightDistance - dist) / (lightDistance - lightStart), 0.f, 1.f);
+		float strengthFactor = clamp((lights[i].radius - dist) / (lights[i].radius), 0.f, 1.f);
 	
 		if(strengthFactor <= 0.04f)
 		{
 			continue;
 		}
 
-		
 		/* DIFFUSE */
 		vec3 toLight = lights[i].position - position;
 		float factor = dot(normalize(toLight), normalize(normal));

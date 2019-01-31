@@ -8,7 +8,7 @@
 #include "Graphics/FBO.h"
 #include "Graphics/Quad.h"
 #include "Entity/Entity.h"
-#include "Entity/Light.h"
+#include "Light/Light.h"
 #include "Utility/FPSCamera.h"
 #include "Terrain/Terrain.h"
 #include "Acceleration/QuadTree.h"
@@ -30,8 +30,7 @@ public:
 	void setSunPosition(const glm::vec3& position);
 	void render();
 	void changeCamera(FPSCamera * camera);
-	const size_t getNumberOfLights() const;
-
+	
 private:
 	void renderFBO();
 	void renderQuadTree();

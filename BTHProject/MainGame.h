@@ -6,7 +6,7 @@
 #include "Renderers/MasterRenderer.h"
 #include "Entity/EntityManager.h"
 #include "Utility/FPSCamera.h"
-#include "Entity/Light.h"
+#include "Light/LightManager.h"
 #include "Terrain/Terrain.h"
 #include "Acceleration/QuadTree.h"
 #include "Terrain/TerrainChunkManager.h"
@@ -35,6 +35,7 @@ private:
 	EntityManager* m_entityManager;
 	TerrainChunkManager* m_terrainChunkManager;
 	Terrain* m_terrain;
+	LightManager* m_lightManager;
 	QuadTree* m_quadTree;
 
 private:

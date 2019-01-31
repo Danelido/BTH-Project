@@ -2,7 +2,7 @@
 #define _FRAMEBUFFER_OBJECT_SHADER_H
 #include "Shader.h"
 #include <GLM/glm.hpp>
-#include "Entity/Light.h"
+#include "Light/Light.h"
 
 
 class FBOShader : public Shader
@@ -24,6 +24,7 @@ private:
 	{
 		GLint positionLocation;
 		GLint colorLocation;
+		GLint radiusLocation;
 	};
 
 	std::vector<lightShaderProperties> m_lightShaderProperties;

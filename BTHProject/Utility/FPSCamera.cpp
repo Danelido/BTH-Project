@@ -68,7 +68,6 @@ void FPSCamera::debugDraw()
 		glBindVertexArray(0);
 	}
 }
-
 // A Debug function
 void FPSCamera::initDebugMode()
 {
@@ -80,11 +79,24 @@ void FPSCamera::initDebugMode()
 bool FPSCamera::insideFrustum(AABB& aabb)
 {
 	bool res = true;
-	for (size_t i = 2; i < 6; i++)
+	for (size_t i = 0; i < 6; i++)
 	{
 		if (m_planes[i].distance(aabb.getVertexP(m_planes[i].normal)) < 0.f)
 			return false;
 		else if (m_planes[i].distance(aabb.getVertexN(m_planes[i].normal)) < 0.f)
+			res = true;
+	}
+	return res;
+}
+
+bool FPSCamera::insideFrustum(const glm::vec3& pos, float radius)
+{
+	bool res = true;
+	for (size_t i = 0; i < 6; i++)
+	{
+		if (m_planes[i].distance(pos) < -radius)
+			return false;
+		else if (m_planes[i].distance(pos) < radius)
 			res = true;
 	}
 	return res;
@@ -253,7 +265,7 @@ void FPSCamera::calculateFrustumPlanes()
 	m_planes[TOP].setPoints(m_nearPlanePoints[3], m_nearPlanePoints[0], m_farPlanePoints[0]);
 	m_planes[BOTTOM].setPoints(m_nearPlanePoints[1], m_nearPlanePoints[2], m_farPlanePoints[2]);
 	m_planes[LEFT].setPoints(m_nearPlanePoints[0], m_nearPlanePoints[1], m_farPlanePoints[0]);
-	m_planes[RIGHT].setPoints(m_nearPlanePoints[2], m_nearPlanePoints[3], m_farPlanePoints[3]);
+	m_planes[RIGHT].setPoints(m_nearPlanePoints[2], m_nearPlanePoints[3], m_farPlanePoints[2]);
 	m_planes[NEARP].setPoints(m_nearPlanePoints[0], m_nearPlanePoints[3], m_nearPlanePoints[2]);
 	m_planes[FARP].setPoints(m_farPlanePoints[3], m_farPlanePoints[0], m_farPlanePoints[1]);
 }

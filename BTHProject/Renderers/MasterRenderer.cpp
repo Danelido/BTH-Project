@@ -32,6 +32,7 @@ MasterRenderer::MasterRenderer(FPSCamera* camera)
 	m_quadTreeDebugShader->setProjectionMatrix(m_projectionMatrix);
 	m_quadTreeDebugShader->unuse();
 
+	m_lights.reserve(AppSettings::MAXLIGHTS());
 }
 
 
@@ -44,11 +45,6 @@ MasterRenderer::~MasterRenderer()
 	delete m_fboQuad;
 	delete m_fboShader;
 	delete m_quadTreeDebugShader;
-
-	for (size_t i = 0; i < m_lights.size(); i++)
-	{
-		delete m_lights[i];
-	}
 }
 
 void MasterRenderer::submitEntity(Entity * entity)
@@ -86,6 +82,9 @@ void MasterRenderer::render()
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
+	if (AppSettings::QUADTREE_DBG())
+		renderQuadTree();
+
 	m_regularRenderer->render(m_activeCamera);
 	m_instancedRenderer->render(m_activeCamera);
 	m_terrainRenderer->render(m_activeCamera);
@@ -94,8 +93,10 @@ void MasterRenderer::render()
 
 	renderFBO();
 
-	if (AppSettings::QUADTREE_DBG())
-		renderQuadTree();
+	m_lights.clear();
+
+
+	
 
 }
 
@@ -137,10 +138,5 @@ void MasterRenderer::renderQuadTree()
 void MasterRenderer::setSunPosition(const glm::vec3& position)
 {
 	m_sunPosition = position;
-}
-
-const size_t MasterRenderer::getNumberOfLights() const
-{
-	return m_lights.size();
 }
 

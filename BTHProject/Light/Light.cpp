@@ -1,84 +1,60 @@
-#include "TerrainChunk.h"
-#include "Acceleration/DataStructs.h"
+#include "Light.h"
 #include "App/AppSettings.h"
+#include "Acceleration/DataStructs.h"
 
-TerrainChunk::TerrainChunk(ParserData * data, Loader* loader, std::vector<GLuint> ids, int cellSize)
+Light::Light(const glm::vec3& position, const glm::vec3& color, const float& radius) :
+	m_position(position), m_color(color), m_radius(radius)
 {
-	m_chunkMesh = loader->createTerrainMesh(data, ids);
-	calculateBoundary(data, cellSize);
-
 	if (AppSettings::QUADTREE_DBG())
-		createGLDebugLines();
-
-	delete data;
+		setupDebugLineData();
 }
 
-TerrainChunk::~TerrainChunk()
+Light::~Light()
 {
-	delete m_boundary;
+	if (m_boundary)
+		delete m_boundary;
 }
 
-const Mesh * TerrainChunk::getMesh() const
+void Light::setPosition(const glm::vec3 & position)
 {
-	return m_chunkMesh;
+	m_position = position;
 }
 
-AABB& TerrainChunk::getBoundary() const
+void Light::setColor(const glm::vec3 & color)
 {
-	return *m_boundary;
+	m_color = color;
 }
 
-const GLuint & TerrainChunk::getDebugLineVao() const
+void Light::setRadius(const float& radius)
 {
-	return m_vao;
+	m_radius = radius;
 }
 
-void TerrainChunk::calculateBoundary(ParserData* data, int cellSize)
+const glm::vec3 & Light::getPosition() const
+{
+	return m_position;
+}
+
+const glm::vec3 & Light::getColor() const
+{
+	return m_color;
+}
+
+const float& Light::getRadius() const
+{
+	return m_radius;
+}
+
+void Light::setupDebugLineData()
 {
 	m_boundary = new AABB();
-	float max_width = -100000.0;
-	float min_width = 100000.0;
-	float max_height = -100000.0;
-	float min_height = 100000.0;
-	float max_depth = -100000.0;
-	float min_depth = 100000.0;
-
-	for (int i = 0; i < data->getVertices().size(); i+=3)
-	{
-		float width = data->getVertices()[i];
-		float height = data->getVertices()[i + 1];
-		float depth = data->getVertices()[i + 2];
-
-		if (width > max_width)
-			max_width = width;
-		
-		else if (width < min_width)
-			min_width = width;
-
-		if (height > max_height)
-			max_height = height;
-
-		else if (height < min_height)
-			min_height = height;
-
-		if (depth > max_depth)
-			max_depth = depth;
-
-		else if (depth < min_depth)
-			min_depth = depth;
-
-	}
-
-	m_boundary->halfDimensions.x = (cellSize - 2.f) / 2.f;
-	m_boundary->halfDimensions.y = (cellSize - 2.f) / 2.f;
-	m_boundary->halfDimensions.z = (cellSize - 2.f) / 2.f;
-	m_boundary->center.x = ((max_width - min_width)) + min_width - m_boundary->halfDimensions.x; 
-	m_boundary->center.y = ((max_height - min_height)) + min_height - m_boundary->halfDimensions.y;
-	m_boundary->center.z = ((max_depth - min_depth)) + min_depth - m_boundary->halfDimensions.z;
-}
-
-void TerrainChunk::createGLDebugLines()
-{
+	m_boundary->halfDimensions.x = m_radius;
+	m_boundary->halfDimensions.y = m_radius;
+	m_boundary->halfDimensions.z = m_radius;
+	m_boundary->center.x = m_position.x;
+	m_boundary->center.y = m_position.y;
+	m_boundary->center.z = m_position.z;
+	
 	float data[24 * 3] =
 	{
 		// FIRST RECTANGLE
@@ -215,15 +191,22 @@ void TerrainChunk::createGLDebugLines()
 		m_boundary->center.z + m_boundary->halfDimensions.z,
 	};
 
+
+	GLuint vbo;
 	glGenVertexArrays(1, &m_vao);
-	glGenBuffers(1, &m_vbo);
+	glGenBuffers(1, &vbo);
 
 	glBindVertexArray(m_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(data), &data, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+}
+
+const GLuint& Light::getVAO() const
+{
+	return m_vao;
 }

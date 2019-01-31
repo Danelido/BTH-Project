@@ -3,56 +3,65 @@
 #include <GLM/glm.hpp>
 #include <Entity/Entity.h>
 #include <Terrain/TerrainChunk.h>
-struct XZ
+#include <Light/Light.h>
+
+struct XYZ
 {
 	float x;
+	float y;
 	float z;
 
-	XZ()
+	XYZ()
 	{
 		x = -1.f;
+		y = -1.f;
 		z = -1.f;
 	}
 
-	XZ(float x, float z)
+	XYZ(float x, float y, float z)
 	{
 		this->x = x;
+		this->y = y;
 		this->z = z;
 	}
 
 };
 
+
 struct AABB
 {
-	XZ center;
-	float halfDimension;
+	XYZ center;
+	XYZ halfDimensions;
+
+	float vertexPN_scalar = 2.f;
 
 	AABB()
 	{
-		this->halfDimension = 0.f;
+		this->halfDimensions.x = 0.f;
+		this->halfDimensions.y = 0.f;
+		this->halfDimensions.z = 0.f;
 	}
 
-	AABB(XZ center, float halfDimension)
+	AABB(XYZ center, float halfDimension)
 	{
 		this->center = center;
-		this->halfDimension = halfDimension;
+		this->halfDimensions.x = halfDimension;
+		this->halfDimensions.y = halfDimension;
+		this->halfDimensions.z = halfDimension;
 	}
 
-	bool containsPoint(XZ point)
+	AABB(XYZ center, float halfDimensionX, float halfDimensionY, float halfDimensionZ)
 	{
-		if (point.x >= center.x - halfDimension && point.x <= center.x + halfDimension
-			&& point.z >= center.z - halfDimension && point.z <= center.z + halfDimension)
-		{
-			return true;
-		}
-
-		return false;
+		this->center = center;
+		this->halfDimensions.x = halfDimensionX;
+		this->halfDimensions.y = halfDimensionY;
+		this->halfDimensions.z = halfDimensionZ;
 	}
 
 	bool containsEntity(Entity* entity)
 	{
-		if (entity->getPosition().x >= center.x - halfDimension && entity->getPosition().x < center.x + halfDimension
-			&& entity->getPosition().z >= center.z - halfDimension && entity->getPosition().z < center.z + halfDimension)
+		if (entity->getPosition().x >= center.x - this->halfDimensions.x && entity->getPosition().x < center.x + this->halfDimensions.x
+			&& entity->getPosition().z >= center.z - this->halfDimensions.z && entity->getPosition().z < center.z + this->halfDimensions.z)
 		{
 			return true;
 		}
@@ -62,8 +71,19 @@ struct AABB
 
 	bool containsTerrainChunk(TerrainChunk* chunk)
 	{
-		if (chunk->getBoundary().center.x >= center.x - halfDimension && chunk->getBoundary().center.x <= center.x + halfDimension
-			&& chunk->getBoundary().center.z >= center.z - halfDimension && chunk->getBoundary().center.z <= center.z + halfDimension)
+		if (chunk->getBoundary().center.x >= center.x - this->halfDimensions.x && chunk->getBoundary().center.x <= center.x + this->halfDimensions.x
+			&& chunk->getBoundary().center.z >= center.z - this->halfDimensions.z && chunk->getBoundary().center.z <= center.z + this->halfDimensions.z)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool containsLight(Light* light)
+	{
+		if (light->getPosition().x + light->getRadius() >= center.x - this->halfDimensions.x && light->getPosition().x - light->getRadius() <= center.x + this->halfDimensions.x
+			&& light->getPosition().z + light->getRadius() >= center.z - this->halfDimensions.z && light->getPosition().z - light->getRadius() <= center.z + this->halfDimensions.z)
 		{
 			return true;
 		}
@@ -73,8 +93,8 @@ struct AABB
 
 	bool intersectsAABB(AABB other)
 	{
-		if (other.center.x >= center.x - halfDimension && other.center.x <= center.x + halfDimension
-			&& other.center.z >= center.z - halfDimension && other.center.z <= center.z + halfDimension)
+		if (other.center.x >= center.x - this->halfDimensions.x && other.center.x <= center.x + this->halfDimensions.x
+			&& other.center.z >= center.z - this->halfDimensions.z && other.center.z <= center.z + this->halfDimensions.z)
 		{
 			return true;
 		}
@@ -84,26 +104,32 @@ struct AABB
 
 	glm::vec3 getVertexP(const glm::vec3& normal)
 	{
-		glm::vec3 ans = glm::vec3(center.x - halfDimension, 0.f , center.z - halfDimension);
+		glm::vec3 ans = glm::vec3(center.x - this->halfDimensions.x, center.y - this->halfDimensions.y, center.z - this->halfDimensions.z);
 
 		if (normal.x > 0)
-			ans.x += halfDimension * 2.f;
+			ans.x += this->halfDimensions.x * vertexPN_scalar;
+
+		if (normal.y > 0)
+			ans.y += this->halfDimensions.y * vertexPN_scalar;
 
 		if (normal.z > 0)
-			ans.z += halfDimension * 2.f;
+			ans.z += this->halfDimensions.z * vertexPN_scalar;
 
 		return ans;
 	}
 
 	glm::vec3 getVertexN(const glm::vec3& normal)
 	{
-		glm::vec3 ans = glm::vec3(center.x - halfDimension, 0.f, center.z - halfDimension);
+		glm::vec3 ans = glm::vec3(center.x - this->halfDimensions.x, center.y - this->halfDimensions.y, center.z - this->halfDimensions.z);
 
 		if (normal.x < 0)
-			ans.x += halfDimension * 2.f;
+			ans.x += this->halfDimensions.x * vertexPN_scalar;
+
+		if (normal.y < 0)
+			ans.y += this->halfDimensions.y * vertexPN_scalar;
 
 		if (normal.z < 0)
-			ans.z += halfDimension * 2.f;
+			ans.z += this->halfDimensions.z * vertexPN_scalar;
 
 		return ans;
 	}

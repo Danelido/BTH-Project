@@ -16,10 +16,12 @@ FBOShader::FBOShader()
 	{
 		std::string posLoc = "lights[" + std::to_string(i) + "].position";
 		std::string colLoc = "lights[" + std::to_string(i) + "].color";
+		std::string radLoc = "lights[" + std::to_string(i) + "].radius";
 
 		lightShaderProperties block;
 		block.positionLocation = glGetUniformLocation(this->program(), posLoc.c_str());
 		block.colorLocation = glGetUniformLocation(this->program(), colLoc.c_str());
+		block.radiusLocation = glGetUniformLocation(this->program(), radLoc.c_str());
 
 		m_lightShaderProperties.emplace_back(block);
 	}
@@ -62,6 +64,9 @@ void FBOShader::registerLights(const std::vector<Light*>* lights)
 			lights->at(i)->getColor().x,
 			lights->at(i)->getColor().y,
 			lights->at(i)->getColor().z);
+
+		glUniform1f(m_lightShaderProperties[i].radiusLocation,
+			lights->at(i)->getRadius());
 	}
 	
 }
