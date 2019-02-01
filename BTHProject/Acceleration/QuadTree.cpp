@@ -11,7 +11,7 @@ QuadTree::QuadTree(AABB boundary, FPSCamera* camera)
 	m_southWest = nullptr;
 	m_southEast = nullptr;
 	m_treeObjects.reserve(QT_NODE_CAPACITY);
-	if(AppSettings::QUADTREE_DBG())
+	if(AppSettings::DEBUG_LAYER())
 		createGLDrawable();
 }
 
@@ -32,6 +32,11 @@ QuadTree::~QuadTree()
 
 	if(m_southEast)
 		delete m_southEast;
+
+	if (AppSettings::DEBUG_LAYER()) {
+		glDeleteBuffers(1, &m_vbo);
+		glDeleteVertexArrays(1, &m_vao);
+	}
 
 }
 
@@ -254,7 +259,7 @@ void QuadTree::createGLDrawable()
 
 void QuadTree::draw(QuadTreeDebugShader* shader)
 {
-	if (AppSettings::QUADTREE_DBG())
+	if (AppSettings::DEBUG_LAYER())
 	{
 		if (m_camera->insideFrustum(m_boundary)) {
 			shader->setColor(glm::vec3(1.0, 1.0f, 1.0f));
@@ -270,7 +275,7 @@ void QuadTree::draw(QuadTreeDebugShader* shader)
 			{
 				if (m_treeObjects[i]->getEntity() != nullptr)
 				{
-					glBindVertexArray(m_treeObjects[i]->getEntity()->getDebugLineVao());
+					glBindVertexArray(m_treeObjects[i]->getEntity()->getDebugVAO());
 					glEnableVertexAttribArray(0);
 					glDrawArrays(GL_LINES, 0, 24);
 					glDisableVertexAttribArray(0);

@@ -22,8 +22,8 @@ public:
 		return m_maxLights;
 	}
 
-	inline static bool QUADTREE_DBG() {
-		return m_quadTreeDbgLayer;
+	inline static bool DEBUG_LAYER() {
+		return m_debugLayer;
 	}
 
 	static void setMaxLights(int maxLights);
@@ -33,12 +33,12 @@ private:
 
 	void setSrcWidth(int width);
 	void setSrcHeight(int height);
-	void setQuadTreeDbgLayer(bool b);
+	void setDebugLayer(bool b);
 
 	static int m_srcWidth;
 	static int m_srcHeight;
 	static int m_maxLights;
-	static bool m_quadTreeDbgLayer;
+	static bool m_debugLayer;
 
 };
 

@@ -38,7 +38,7 @@ private:
 // DEBUG PURPOSE
 private:
 	void setupFrustumLinesAndLoadBuffer();
-	void calculateLineData();
+	void calculateDebugData();
 	float* m_lineData;
 	GLuint m_vao;
 	GLuint m_vbo;

@@ -21,6 +21,11 @@ Entity::Entity(InstancedMesh * instancedMesh, const glm::vec3 & position, const 
 Entity::~Entity()
 {
 	delete m_boundary;
+
+	if (AppSettings::DEBUG_LAYER()) {
+		glDeleteBuffers(1, &m_vbo);
+		glDeleteVertexArrays(1, &m_vao);
+	}
 }
 
 void Entity::setPosition(const glm::vec3 & position)
@@ -53,7 +58,7 @@ void Entity::updateBoundary()
 	m_boundary->center.x = m_position.x;
 	m_boundary->center.y = m_position.y + m_boundary->halfDimensions.y;
 	m_boundary->center.z = m_position.z;
-	if (AppSettings::QUADTREE_DBG() && !m_hasBeenSetUp) {
+	if (AppSettings::DEBUG_LAYER() && !m_hasBeenSetUp) {
 		
 		m_hasBeenSetUp = true;
 
@@ -210,7 +215,7 @@ void Entity::updateBoundary()
 
 }
 
-GLuint Entity::getDebugLineVao()
+GLuint Entity::getDebugVAO()
 {
 	return m_vao;
 }

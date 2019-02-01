@@ -7,7 +7,7 @@ TerrainChunk::TerrainChunk(ParserData * data, Loader* loader, std::vector<GLuint
 	m_chunkMesh = loader->createTerrainMesh(data, ids);
 	calculateBoundary(data, cellSize);
 
-	if (AppSettings::QUADTREE_DBG())
+	if (AppSettings::DEBUG_LAYER())
 		createGLDebugLines();
 
 	delete data;
@@ -16,6 +16,10 @@ TerrainChunk::TerrainChunk(ParserData * data, Loader* loader, std::vector<GLuint
 TerrainChunk::~TerrainChunk()
 {
 	delete m_boundary;
+	if (AppSettings::DEBUG_LAYER()) {
+		glDeleteBuffers(1, &m_vbo);
+		glDeleteVertexArrays(1, &m_vao);
+	}
 }
 
 const Mesh * TerrainChunk::getMesh() const
@@ -28,7 +32,7 @@ AABB& TerrainChunk::getBoundary() const
 	return *m_boundary;
 }
 
-const GLuint & TerrainChunk::getDebugLineVao() const
+const GLuint & TerrainChunk::getDebugVAO() const
 {
 	return m_vao;
 }

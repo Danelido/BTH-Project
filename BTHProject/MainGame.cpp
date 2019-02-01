@@ -6,6 +6,9 @@
 #include "Vendor/ImGui/imgui_impl_glfw.h"
 #include "App/AppSettings.h"
 
+#define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
+#define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
+
 MainGame::MainGame()
 {
 	m_parser = new Parser();
@@ -79,7 +82,7 @@ void MainGame::spawnObjects()
 	float maxDist = 251;
 
 	// Entities
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		float x = RandomNum::single(5.f, maxDist);
 		float z = RandomNum::single(5.f, maxDist);
@@ -144,23 +147,62 @@ void MainGame::render()
 
 void MainGame::renderImGUI(float dt)
 {
-	ImGui::Begin("OpenGL");
-	ImGui::Text("C = Lock/Unlock FPS camera");
-	ImGui::Text("WASD = Move around");
-	ImGui::Text("Space & CTRL = Move Up/Down");
-	ImGui::Text("Average deltaT: %f", dt);
-	ImGui::Text("Entities processed: %i", m_entityManager->entitiesProcessed());
-	ImGui::Text("Number of lights: %i", m_lightManager->getNrOfLightsProcessed());
-	ImGui::Text("Position: (%f, %f, %f)", m_fpsCamera->getPosition().x, m_fpsCamera->getPosition().y, m_fpsCamera->getPosition().z);
-	ImGui::Text("Camera Up: (%f, %f, %f)", m_fpsCamera->getCameraUp().x, m_fpsCamera->getCameraUp().y, m_fpsCamera->getCameraUp().z);
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	ImGui::Checkbox("Vsync", &m_vSync);
-	ImGui::Checkbox("Terrain walking", &m_terrainWalk);
-	ImGui::Checkbox("Switch to dbg camera", &m_dbgCameraActive);
-	ImGui::Checkbox("Ignore quadtree", &m_ignoreQuadtree);
-	ImGui::SliderFloat("JumpForce", &m_jumpForce, 0.00f, 20.0f);
-	ImGui::SliderFloat("Gravity", &m_gravity, -20.f, 0.f);
-	
+	glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX,
+		&m_total_mem_kb);
+
+	glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX,
+		&m_cur_avail_mem_kb);
+
+	ImGui::Begin("GL");
+
+	if (ImGui::Button("Info", ImVec2(90.f, 20.f)))
+	{
+		m_infoTab = true;
+		m_controlsTab = false;
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Controls", ImVec2(90.f, 20.f)))
+	{
+		m_infoTab = false;
+		m_controlsTab = true;
+	}
+
+	float fps = ImGui::GetIO().Framerate;
+
+	if (fps < 30.f)
+		ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.f, 1.0f), "FPS: %.1f", fps);
+	else if (fps >= 30.0f && fps < 55.0f)
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.f, 1.0f), "FPS: %.1f", fps);
+	else
+		ImGui::TextColored(ImVec4(0.f, 1.0f, 0.f, 1.0f), "FPS: %.1f", fps);
+
+
+	if (m_infoTab)
+	{
+		ImGui::TextColored(ImVec4(204.f / 255.f, 102.f / 255.f, 0.f, 1.0f),
+			"Total GPU Memory: %i%s\n%s%i%s\n%s%i%s", m_total_mem_kb / 1024, " MB", "Available GPU Memory: ", m_cur_avail_mem_kb / 1024, " MB",
+			"Used GPU Memory: ", (m_total_mem_kb / 1024) - (m_cur_avail_mem_kb / 1024), " MB");
+
+		ImGui::Text("Frame average %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
+		ImGui::Text("Average delta time: %f", dt);
+		ImGui::Text("Entities processed: %i", m_entityManager->entitiesProcessed());
+		ImGui::Text("Lights processed: %i", m_lightManager->getNrOfLightsProcessed());
+		ImGui::Text("Position: (%f, %f, %f)", m_fpsCamera->getPosition().x, m_fpsCamera->getPosition().y, m_fpsCamera->getPosition().z);
+		ImGui::Text("Camera Up: (%f, %f, %f)", m_fpsCamera->getCameraUp().x, m_fpsCamera->getCameraUp().y, m_fpsCamera->getCameraUp().z);
+		ImGui::Text("C = Lock/Unlock camera");
+		ImGui::Text("WASD = Move around");
+		ImGui::Text("Space & CTRL = Move Up/Down");
+	}
+
+	if (m_controlsTab) 
+	{
+		ImGui::Checkbox("Vsync", &m_vSync);
+		ImGui::Checkbox("Terrain walking", &m_terrainWalk);
+		ImGui::Checkbox("Switch to dbg camera", &m_dbgCameraActive);
+		ImGui::Checkbox("Ignore quadtree", &m_ignoreQuadtree);
+		ImGui::SliderFloat("JumpForce", &m_jumpForce, 0.00f, 20.0f);
+		ImGui::SliderFloat("Gravity", &m_gravity, -20.f, 0.f);
+	}
 	ImGui::End();
 
 	ImGui::Render();

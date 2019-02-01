@@ -29,6 +29,10 @@ FPSCamera::FPSCamera(const glm::vec3& position)
 
 FPSCamera::~FPSCamera()
 {
+	if (AppSettings::DEBUG_LAYER()) {
+		glDeleteBuffers(1, &m_vbo);
+		glDeleteVertexArrays(1, &m_vao);
+	}
 }
 
 void FPSCamera::update(float dt)
@@ -52,8 +56,8 @@ void FPSCamera::update(float dt)
 // A Debug function
 void FPSCamera::debugDraw()
 {
-	if (m_debugCamera && AppSettings::QUADTREE_DBG()) {
-		calculateLineData();
+	if (m_debugCamera && AppSettings::DEBUG_LAYER()) {
+		calculateDebugData();
 		
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 		glBufferData(GL_ARRAY_BUFFER, m_numVertices * sizeof(m_lineData) * 3, NULL, GL_DYNAMIC_DRAW);
@@ -72,7 +76,7 @@ void FPSCamera::debugDraw()
 void FPSCamera::initDebugMode()
 {
 	m_debugCamera = true;
-	calculateLineData();
+	calculateDebugData();
 	setupFrustumLinesAndLoadBuffer();
 }
 
@@ -290,7 +294,7 @@ void FPSCamera::setupFrustumLinesAndLoadBuffer()
 }
 
 // A Debug function
-void FPSCamera::calculateLineData()
+void FPSCamera::calculateDebugData()
 {
 	float data[24 * 3] =
 	{

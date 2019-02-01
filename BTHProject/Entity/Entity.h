@@ -17,7 +17,7 @@ public:
 	void setRotation(const glm::vec3& rotation);
 	void setScale(const glm::vec3& scale);
 	void updateBoundary();
-	GLuint getDebugLineVao();
+	GLuint getDebugVAO();
 	const glm::vec3& getPosition() const;
 	const glm::vec3& getRotation() const;
 	const glm::vec3& getScale() const;

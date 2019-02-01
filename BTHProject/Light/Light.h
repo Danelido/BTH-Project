@@ -19,8 +19,8 @@ public:
 	const float& getRadius() const;
 
 	// Debug purpose
-	void setupDebugLineData();
-	const GLuint& getVAO() const;
+	void setupDebugData();
+	const GLuint& getDebugVAO() const;
 
 private:
 	glm::vec3 m_position;
@@ -32,6 +32,7 @@ private:
 private:
 	AABB* m_boundary;
 	GLuint m_vao;
+	GLuint m_vbo;
 
 };
 

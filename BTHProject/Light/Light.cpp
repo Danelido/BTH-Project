@@ -5,14 +5,19 @@
 Light::Light(const glm::vec3& position, const glm::vec3& color, const float& radius) :
 	m_position(position), m_color(color), m_radius(radius)
 {
-	if (AppSettings::QUADTREE_DBG())
-		setupDebugLineData();
+	if (AppSettings::DEBUG_LAYER())
+		setupDebugData();
 }
 
 Light::~Light()
 {
 	if (m_boundary)
 		delete m_boundary;
+
+	if (AppSettings::DEBUG_LAYER()) {
+		glDeleteBuffers(1, &m_vbo);
+		glDeleteVertexArrays(1, &m_vao);
+	}
 }
 
 void Light::setPosition(const glm::vec3 & position)
@@ -45,7 +50,7 @@ const float& Light::getRadius() const
 	return m_radius;
 }
 
-void Light::setupDebugLineData()
+void Light::setupDebugData()
 {
 	m_boundary = new AABB();
 	m_boundary->halfDimensions.x = m_radius;
@@ -192,12 +197,11 @@ void Light::setupDebugLineData()
 	};
 
 
-	GLuint vbo;
 	glGenVertexArrays(1, &m_vao);
-	glGenBuffers(1, &vbo);
+	glGenBuffers(1, &m_vbo);
 
 	glBindVertexArray(m_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(data), &data, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -206,7 +210,7 @@ void Light::setupDebugLineData()
 	glBindVertexArray(0);
 }
 
-const GLuint& Light::getVAO() const
+const GLuint& Light::getDebugVAO() const
 {
 	return m_vao;
 }

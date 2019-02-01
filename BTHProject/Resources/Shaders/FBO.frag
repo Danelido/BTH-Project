@@ -28,27 +28,32 @@ void main()
 	vec3 position = texture(gPosition,frag_uv).rgb;
 	vec3 normal = texture(gNormal,frag_uv).rgb;
 	vec3 albedo = texture(gAlbedoSpec,frag_uv).rgb;
-	float specular = texture(gAlbedoSpec,frag_uv).a; 
+	float specularStrength = texture(gAlbedoSpec,frag_uv).a; 
+	specularStrength = 0.5f;
 
 	// Ambient color
 	float ambientFactor = 0.2f;
 	vec3 ambient = vec3(1.f) * ambientFactor;
 	vec4 currentColor = vec4(ambient,1.0f);
 
-
 	// Sun
-		/* DIFFUSE */
+		// Diffuse
 		vec3 toLight = sunPosition - position;
 		float factor = dot(normalize(toLight), normalize(normal));
 		factor = max(factor, 0.0f);
-		
 		vec3 diffuse = sunColor * factor;
 
-		/* FINAL COLOR */
-		currentColor += vec4((diffuse), 0.f);
+		// Phong
+		vec3 viewDirection = normalize(cameraPos - position);
+		vec3 reflectDirection = reflect(-normalize(toLight), normalize(normal));
+		float spec = pow(max(dot(viewDirection,reflectDirection), 0.0), 32);
+		vec3 specular = specularStrength * spec * sunColor;
+
+		// Add it to currentColor
+		currentColor += vec4((diffuse + specular), 0.f);
 		
 
-	// Every other light
+	// Every processed point lights
 	for(int i = 0; i < nrOfLights; i++)
 	{
 		float dist = length((lights[i].position - position));
@@ -59,16 +64,19 @@ void main()
 			continue;
 		}
 
-		/* DIFFUSE */
-		vec3 toLight = lights[i].position - position;
-		float factor = dot(normalize(toLight), normalize(normal));
+		// Diffuse
+		toLight = lights[i].position - position;
+		factor = dot(normalize(toLight), normalize(normal));
 		factor = max(factor, 0.0f);
-		vec3 diffuse = lights[i].color * factor * strengthFactor;
+		diffuse = lights[i].color * factor * strengthFactor;
 
-		// TODO: Phong
+		// Phong
+		viewDirection = normalize(cameraPos - position);
+		reflectDirection = reflect(-normalize(toLight), normalize(normal));
+		spec = pow(max(dot(viewDirection,reflectDirection), 0.0), 32);
+		specular = specularStrength * spec * lights[i].color;
 
-
-		/* FINAL COLOR */
+		 // Add it to currentColor 
 		currentColor += vec4((diffuse), 0.f);
 	}
 

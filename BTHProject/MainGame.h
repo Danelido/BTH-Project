@@ -39,6 +39,10 @@ private:
 	QuadTree* m_quadTree;
 
 private:
+	//GPU info
+	GLint m_total_mem_kb = 0;
+	GLint m_cur_avail_mem_kb = 0;
+
 	bool m_vSync;
 	bool m_dbgCameraActive;
 	bool m_ignoreQuadtree;
@@ -53,6 +57,10 @@ private:
 	float m_upAcceleration;
 	float m_jumpForce;
 	bool m_canJump;
+
+	// ImGui
+	bool m_infoTab = true;
+	bool m_controlsTab = false;
 };
 
 #endif

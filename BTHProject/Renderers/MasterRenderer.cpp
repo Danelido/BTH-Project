@@ -82,7 +82,7 @@ void MasterRenderer::render()
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	if (AppSettings::QUADTREE_DBG())
+	if (AppSettings::DEBUG_LAYER())
 		renderQuadTree();
 
 	m_regularRenderer->render(m_activeCamera);

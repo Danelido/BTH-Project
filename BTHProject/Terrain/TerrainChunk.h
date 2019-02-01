@@ -15,7 +15,7 @@ public:
 	const Mesh* getMesh() const;
 	AABB& getBoundary() const;
 
-	const GLuint& getDebugLineVao() const;
+	const GLuint& getDebugVAO() const;
 
 private:
 	void calculateBoundary(ParserData* data, int cellSize);
