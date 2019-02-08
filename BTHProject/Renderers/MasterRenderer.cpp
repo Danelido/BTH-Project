@@ -85,7 +85,7 @@ void MasterRenderer::render()
 	if (AppSettings::DEBUG_LAYER())
 		renderQuadTree();
 
-	m_regularRenderer->render(m_activeCamera);
+	m_regularRenderer->render(m_activeCamera, m_camera);
 	m_instancedRenderer->render(m_activeCamera, m_camera);
 	m_terrainRenderer->render(m_activeCamera, m_camera);
 	

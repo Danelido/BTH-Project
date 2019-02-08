@@ -11,11 +11,13 @@ public:
 
 	void setModelMatrix(const glm::mat4& model);
 	void setViewMatrix(const glm::mat4& view);
+	void setCameraPosition(const glm::vec3& position);
 	void setProjectionMatrix(const glm::mat4& proj);
 private:
 	GLint m_modelMatrixLocation;
 	GLint m_viewMatrixLocation;
 	GLint m_projectionMatrixLocation;
+	GLuint m_cameraPositionLocation;
 
 };
 

@@ -15,7 +15,7 @@ public:
 	RegularRenderer(const glm::mat4& projectionMatrix);
 	~RegularRenderer();
 	void submit(Entity* entity);
-	void render(const FPSCamera* camera);
+	void render(const FPSCamera * activeCamera, const FPSCamera* mainCamera);
 
 private:
 	void bindMesh(Mesh* mesh, const FPSCamera* camera);

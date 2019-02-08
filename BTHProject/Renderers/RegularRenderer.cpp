@@ -33,16 +33,16 @@ void RegularRenderer::submit(Entity * entity)
 	
 }
 
-void RegularRenderer::render(const FPSCamera * camera)
+void RegularRenderer::render(const FPSCamera * activeCamera, const FPSCamera* mainCamera)
 {
 	if (m_meshes.size() == 0)
 		return;
 
 	m_meshShader->use();
-	m_meshShader->setViewMatrix(camera->getViewMatrix());
+	m_meshShader->setViewMatrix(activeCamera->getViewMatrix());
 	for (auto &meshMap : m_meshes)
 	{
-		bindMesh(meshMap.first, camera);
+		bindMesh(meshMap.first, mainCamera);
 
 		for (auto entity : meshMap.second)
 		{
@@ -64,7 +64,7 @@ void RegularRenderer::bindMesh(Mesh * mesh, const FPSCamera* camera)
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
-
+	this->m_meshShader->setCameraPosition(camera->getPosition());
 	for (int i = 0; i < mesh->getTexIDs().size(); i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);

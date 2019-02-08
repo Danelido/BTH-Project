@@ -58,7 +58,7 @@ void MainGame::spawnObjects()
 	ParserData* treeData = m_parser->parseFile("Resources/Models/tree.obj");
 
 	// Choose if the entities is rendered with instancing or just regular ( 1 draw call per object )
-#define instanced 1
+#define instanced 0
 #if instanced
 	InstancedMesh* m_treeMesh = m_loader->createInstancedMesh(treeData);
 #else
@@ -98,7 +98,7 @@ void MainGame::spawnObjects()
 	}
 
 	//Lights
-	for (int i = 0; i < AppSettings::MAXLIGHTS(); i++)
+	for (int i = 0; i < 20; i++)
 	{
 		float x = RandomNum::single(5.f, maxDist);
 		float z = RandomNum::single(5.f, maxDist);
