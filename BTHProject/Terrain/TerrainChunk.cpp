@@ -73,9 +73,9 @@ void TerrainChunk::calculateBoundary(ParserData* data, int cellSize)
 
 	}
 
-	m_boundary->halfDimensions.x = (cellSize - 2.f) / 2.f;
-	m_boundary->halfDimensions.y = (cellSize - 2.f) / 2.f;
-	m_boundary->halfDimensions.z = (cellSize - 2.f) / 2.f;
+	m_boundary->halfDimensions.x = (cellSize) / 2.f;
+	m_boundary->halfDimensions.y = (cellSize) / 2.f;
+	m_boundary->halfDimensions.z = (cellSize) / 2.f;
 	m_boundary->center.x = ((max_width - min_width)) + min_width - m_boundary->halfDimensions.x; 
 	m_boundary->center.y = ((max_height - min_height)) + min_height - m_boundary->halfDimensions.y;
 	m_boundary->center.z = ((max_depth - min_depth)) + min_depth - m_boundary->halfDimensions.z;

@@ -82,7 +82,7 @@ void MainGame::spawnObjects()
 	float maxDist = 251;
 
 	// Entities
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		float x = RandomNum::single(5.f, maxDist);
 		float z = RandomNum::single(5.f, maxDist);
@@ -103,11 +103,11 @@ void MainGame::spawnObjects()
 		float x = RandomNum::single(5.f, maxDist);
 		float z = RandomNum::single(5.f, maxDist);
 		float y = m_terrain->getHeight(glm::vec3(x, 0.f, z)) + 3.f;
-
+		//float y = 0;
 		Light* light = new Light(
 			glm::vec3(x,y,z),
 			RandomNum::vec3(0.f, 255.f, 0.f, 255.f, 0.f, 255.f) / 255.f,
-			10.f);
+			8.f);
 
 		m_lightManager->addLight(light);
 		m_quadTree->insert(light);
@@ -223,7 +223,7 @@ void MainGame::queryTreeAndUpdateManagers(float dt)
 
 void MainGame::jumpFunc(float dt)
 {
-	if (m_terrainWalk)
+	if (m_terrainWalk && m_terrain)
 	{
 		float cameraY = m_fpsCamera->getPosition().y;
 		float targetY = m_terrain->getHeight(m_fpsCamera->getPosition()) + 2.f;

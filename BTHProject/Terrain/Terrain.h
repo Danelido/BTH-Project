@@ -22,7 +22,6 @@ public:
 	~Terrain();
 private:
 	void loadHeightsFromHeightmap(unsigned char* textureData, int width, int height, int channels);
-	void setTerrainCoordinates();
 	glm::vec3 calculateNormals(TerrainData v1, TerrainData v2, TerrainData v3);
 	void smoothNormals();
 	void generateTerrain();

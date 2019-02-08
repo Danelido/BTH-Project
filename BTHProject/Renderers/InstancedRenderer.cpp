@@ -31,12 +31,12 @@ void InstancedRenderer::submit(Entity * entity)
 	}
 }
 
-void InstancedRenderer::render(const FPSCamera* camera)
+void InstancedRenderer::render(const FPSCamera* activeCamera, const FPSCamera* mainCamera)
 {
 	if (m_instancedMeshes.size() == 0) return;
 
 	m_instancedShader->use();
-	m_instancedShader->setViewMatrix(camera->getViewMatrix());
+	m_instancedShader->setViewMatrix(activeCamera->getViewMatrix());
 
 	for (auto &instancedMeshMap : m_instancedMeshes)
 	{
@@ -52,7 +52,7 @@ void InstancedRenderer::render(const FPSCamera* camera)
 		
 		end();
 		
-		flush(instancedMeshMap.first, instancedMeshMap.second.size(), camera);
+		flush(instancedMeshMap.first, instancedMeshMap.second.size(), mainCamera);
 		
 		m_modelMatrices.clear();
 	}

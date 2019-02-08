@@ -14,7 +14,7 @@ public:
 	InstancedRenderer(const glm::mat4& projectionMatrix);
 	~InstancedRenderer();
 	void submit(Entity* entity);
-	void render(const FPSCamera* camera);
+	void render(const FPSCamera* activeCamera, const FPSCamera* mainCamera);
 
 private:
 	void begin(InstancedMesh* mesh, size_t quantity);

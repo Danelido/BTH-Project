@@ -5,21 +5,21 @@ layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 uv;
 layout (location = 3) in mat4 modelMatrix;
 
-uniform mat4 viewMatrix;
-uniform mat4 projectionMatrix;
-uniform vec3 cameraPos;
 
-out vec3 frag_normal;
-out vec2 frag_uv;
-out vec3 frag_objectPos;
-out vec3 frag_cameraPos;
+out VS_DATA
+{
+    vec3 position;
+    vec3 normal;
+    vec2 uv;
+    mat4 modelMatrix;
+
+} vs_data;
 
 void main()
 {
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0f);
-    frag_normal = normal;
-    frag_uv = uv;
-	frag_cameraPos = cameraPos;
-	frag_objectPos = vec3(modelMatrix * vec4(position, 1.0f));
-	
+    vs_data.position = position;
+    vs_data.normal = normal;
+    vs_data.uv = uv;
+    vs_data.modelMatrix = modelMatrix;
+    
 }

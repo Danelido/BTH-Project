@@ -2,7 +2,7 @@
 
 InstancedMeshShader::InstancedMeshShader()
 {
-	if (!loadShaders("Resources/Shaders/InstancedMesh.vert", "Resources/Shaders/InstancedMesh.frag", nullptr))
+	if (!loadShaders("Resources/Shaders/InstancedMesh.vert", "Resources/Shaders/InstancedMesh.frag", "Resources/Shaders/instancedBackCull.geom"))
 	{
 		system("pause");
 	}

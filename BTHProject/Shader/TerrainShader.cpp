@@ -2,7 +2,7 @@
 
 TerrainShader::TerrainShader()
 {
-	if (!loadShaders("Resources/Shaders/TerrainShader.vert", "Resources/Shaders/TerrainShader.frag", nullptr))
+	if (!loadShaders("Resources/Shaders/TerrainShader.vert", "Resources/Shaders/TerrainShader.frag", "Resources/Shaders/TerrainBackCull.geom"))
 	{
 		system("pause");
 	}

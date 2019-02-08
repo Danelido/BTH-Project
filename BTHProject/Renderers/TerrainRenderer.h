@@ -11,14 +11,14 @@ public:
 	TerrainRenderer(const glm::mat4& projectionMatrix);
 	~TerrainRenderer();
 	void submit(TerrainChunk* chunk);
-	void render(const FPSCamera* camera);
+	void render(const FPSCamera* activeCamera, const FPSCamera* mainCamera);
 
 private:
-	void bindMesh(TerrainChunk* chunk, const FPSCamera* camera);
+	void bindMesh(TerrainChunk* chunk);
 	void unbindMesh();
 private:
 	TerrainShader* m_terrainShader;
-
+	glm::mat4 m_modelMatrix;
 	std::vector<TerrainChunk*> m_chunks;
 };
 

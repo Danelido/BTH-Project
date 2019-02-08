@@ -180,7 +180,6 @@
     <ClCompile Include="Shader\TerrainShader.cpp" />
     <ClCompile Include="Terrain\TerrainChunk.cpp" />
     <ClCompile Include="Terrain\TerrainChunkManager.cpp" />
-    <ClCompile Include="Utility\Camera.cpp" />
     <ClCompile Include="Utility\FPSCamera.cpp" />
     <ClCompile Include="Utility\Input.cpp" />
     <ClCompile Include="Meshes\InstancedMesh.cpp" />
@@ -234,7 +233,6 @@
     <ClInclude Include="Shader\TerrainShader.h" />
     <ClInclude Include="Terrain\TerrainChunk.h" />
     <ClInclude Include="Terrain\TerrainChunkManager.h" />
-    <ClInclude Include="Utility\Camera.h" />
     <ClInclude Include="Utility\FPSCamera.h" />
     <ClInclude Include="Utility\Input.h" />
     <ClInclude Include="Meshes\InstancedMesh.h" />
@@ -267,6 +265,8 @@
     <ClInclude Include="Vendor\ImGui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Shaders\BasicBackCull.geom" />
+    <None Include="Resources\Shaders\instancedBackCull.geom" />
     <None Include="Resources\Shaders\BasicMesh.frag" />
     <None Include="Resources\Shaders\BasicMesh.vert" />
     <None Include="Resources\Shaders\FBO.frag" />
@@ -275,6 +275,7 @@
     <None Include="Resources\Shaders\InstancedMesh.vert" />
     <None Include="Resources\Shaders\QuadTreeDebug.frag" />
     <None Include="Resources\Shaders\QuadTreeDebug.vert" />
+    <None Include="Resources\Shaders\TerrainBackCull.geom" />
     <None Include="Resources\Shaders\TerrainShader.frag" />
     <None Include="Resources\Shaders\TerrainShader.vert" />
   </ItemGroup>

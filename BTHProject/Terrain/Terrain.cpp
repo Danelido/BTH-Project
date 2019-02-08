@@ -21,7 +21,6 @@ Terrain::Terrain(Loader* loader, TerrainChunkManager* chunkManager, QuadTree* qu
 	if (textureData && width == m_terrainWidth && height == m_terrainHeight)
 	{
 		loadHeightsFromHeightmap(textureData, width,height,channels);
-		setTerrainCoordinates();
 		smoothNormals();
 		generateTerrain();
 		m_loadedSuccessful = true;
@@ -73,27 +72,13 @@ void Terrain::loadHeightsFromHeightmap(unsigned char * textureData, int width, i
 			int index = (x + width * y);
 			unsigned char* pixelOffset = textureData + index * channels;
 			float height = pixelOffset[0];
-			m_heightmapCoords[index].y = height;
-		}
-	}
-
-}
-
-void Terrain::setTerrainCoordinates()
-{
-	for (size_t y = 0; y < m_terrainHeight; y++)
-	{
-		for (size_t x = 0; x < m_terrainWidth; x++)
-		{
-			size_t index = x + (m_terrainWidth * y);
+			
 			m_heightmapCoords[index].x = (float)x;
 			m_heightmapCoords[index].z = -(float)y;
-
 			// Make z positive range
 			m_heightmapCoords[index].z += (float)(m_terrainHeight - 1);
-			
-			// scale height
-			m_heightmapCoords[index].y /= m_heightScaleDivider;
+
+			m_heightmapCoords[index].y = height / m_heightScaleDivider;
 		}
 	}
 
@@ -157,7 +142,7 @@ void Terrain::generateTerrain()
 	size_t bl_index; // bottom left
 	size_t br_index; // bottom right
 	size_t ur_index; // upper right
-
+	
 	for (size_t y = 0; y < m_terrainHeight - 1; y++)
 	{
 		for (size_t x = 0; x < m_terrainWidth - 1; x++)
@@ -167,7 +152,7 @@ void Terrain::generateTerrain()
 			br_index = (m_terrainWidth * (y + 1)) + (x + 1);
 			ur_index = (m_terrainWidth * (y)) + (x + 1);
 		
-			// FIRST TRIANGLE
+			// ---------------FIRST TRIANGLE---------------
 			// Upper left
 			m_data->addVertex(m_heightmapCoords[ul_index].x, m_heightmapCoords[ul_index].y, m_heightmapCoords[ul_index].z);
 			m_data->addUV(
@@ -196,7 +181,9 @@ void Terrain::generateTerrain()
 			m_data->addNormal(m_heightmapCoords[br_index].nx, m_heightmapCoords[br_index].ny, m_heightmapCoords[br_index].nz);
 			m_data->addIndices(index++);
 
-			// SECOND TRIANGLE
+
+
+			//--------------- SECOND TRIANGLE---------------
 			// bottom right
 			m_data->addVertex(m_heightmapCoords[br_index].x, m_heightmapCoords[br_index].y, m_heightmapCoords[br_index].z);
 			m_data->addUV(
@@ -235,14 +222,16 @@ void Terrain::generateTerrain()
 	textures.emplace_back("Resources/Textures/granite.png");
 	std::vector<GLuint> textureIDS = m_loader->createTexture(textures);
 	
-	int cellWidth = 33;
-	int cellHeight = 33;
-	int cellRowCount = (m_terrainWidth-1) / (cellWidth - 1);
+
+	int cellWidth = 17;
+	int cellHeight = 17;
+	int cellRowCount = (m_terrainWidth - 1) / (cellWidth - 1);
 	int cellCount = cellRowCount * cellRowCount;
 	m_chunkManager->reserveVectorMemory(cellCount);
 
 	for (int j = 0; j <= cellRowCount; j++)
 	{
+
 		for (int i = 0; i <= cellRowCount; i++)
 		{
 			int index = (cellRowCount * j) + i;
@@ -260,12 +249,19 @@ void Terrain::generateTerrainCells(int nodeX, int nodeY, int cellWidth, int cell
 	int uvIndex = ((nodeX * (cellWidth-1)) + (nodeY * (cellHeight-1) * (m_terrainWidth - 1))) * 12;
 	int index = 0;
 	int col = cellHeight;
-	if (nodeY == 7)
-		col -= 2;
-
-	for (int j = 0; j < col - 1; j++)
+	int row = (cellWidth - 1) * 6;
+	
+	if (nodeY == 15)
 	{
-		for (int i = 0; i < (cellWidth - 1) * 6; i++)
+
+		col -= 3;
+	}
+
+
+	for (int j = 0; j < col; j++)
+	{
+
+		for (int i = 0; i < row; i++)
 		{
 			cellData->addVertex(m_data->getVertices().at(dataIndex), m_data->getVertices().at(dataIndex + 1), m_data->getVertices().at(dataIndex + 2));
 			cellData->addNormal(m_data->getNormals().at(dataIndex), m_data->getNormals().at(dataIndex + 1), m_data->getNormals().at(dataIndex + 2));

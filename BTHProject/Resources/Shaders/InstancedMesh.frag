@@ -6,7 +6,6 @@ layout(location = 2) out vec4 gAlbedoSpec;
 
 in vec3 frag_normal;
 in vec3 frag_objectPos;
-in vec3 frag_cameraPos;
 in vec2 frag_uv;
 
 uniform sampler2D textureSampler;

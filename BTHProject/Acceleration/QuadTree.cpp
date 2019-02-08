@@ -283,11 +283,11 @@ void QuadTree::draw(QuadTreeDebugShader* shader)
 				}
 				else if (m_treeObjects[i]->getChunk() != nullptr)
 				{
-					/*glBindVertexArray(m_treeObjects[i]->getChunk()->getDebugLineVao());
+					glBindVertexArray(m_treeObjects[i]->getChunk()->getDebugVAO());
 					glEnableVertexAttribArray(0);
 					glDrawArrays(GL_LINES, 0, 24);
 					glDisableVertexAttribArray(0);
-					glBindVertexArray(0);*/
+					glBindVertexArray(0);
 				}
 				else if (m_treeObjects[i]->getLight() != nullptr)
 				{

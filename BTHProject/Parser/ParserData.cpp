@@ -1,6 +1,6 @@
 #include "ParserData.h"
 
-#define CAPACITY 250000
+#define CAPACITY 500000 // 500k
 
 ParserData::ParserData()
 {

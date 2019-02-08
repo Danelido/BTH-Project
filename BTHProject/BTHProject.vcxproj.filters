@@ -123,9 +123,6 @@
     <ClCompile Include="Shader\QuadTreeDebugShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utility\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Terrain\TerrainChunk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -260,9 +257,6 @@
     <ClInclude Include="Shader\QuadTreeDebugShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Terrain\TerrainChunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -290,5 +284,8 @@
     <None Include="Resources\Shaders\InstancedMesh.vert" />
     <None Include="Resources\Shaders\QuadTreeDebug.vert" />
     <None Include="Resources\Shaders\QuadTreeDebug.frag" />
+    <None Include="Resources\Shaders\instancedBackCull.geom" />
+    <None Include="Resources\Shaders\TerrainBackCull.geom" />
+    <None Include="Resources\Shaders\BasicBackCull.geom" />
   </ItemGroup>
 </Project>

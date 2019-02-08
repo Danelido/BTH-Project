@@ -7,7 +7,6 @@ layout (location = 2) out vec4 gAlbedoSpec;
 in vec3 frag_normal;
 in vec2 frag_uv;
 in vec3 frag_objectPos;
-in vec3 frag_cameraPos;
 
 layout (location = 4) uniform sampler2D blendMap;
 layout (location = 3) uniform sampler2D backgroundTexture;
@@ -21,10 +20,8 @@ void main()
 	vec4 blendMapColor = texture(blendMap, frag_uv);
 	float backgroundTextureFactor = 1.f - (blendMapColor.r + blendMapColor.g + blendMapColor.b);
 
-
 	vec2 newUV = frag_uv * 40;
 	
-
 	vec4 backgroundColor = texture(backgroundTexture, newUV) * backgroundTextureFactor;
 	vec4 rTextureColor = texture(rTexture, newUV) * blendMapColor.r;
 	vec4 gTextureColor = texture(gTexture, newUV) * blendMapColor.g;

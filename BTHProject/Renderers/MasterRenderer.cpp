@@ -86,8 +86,8 @@ void MasterRenderer::render()
 		renderQuadTree();
 
 	m_regularRenderer->render(m_activeCamera);
-	m_instancedRenderer->render(m_activeCamera);
-	m_terrainRenderer->render(m_activeCamera);
+	m_instancedRenderer->render(m_activeCamera, m_camera);
+	m_terrainRenderer->render(m_activeCamera, m_camera);
 	
 	m_FBO->unbindFramebuffer();
 
