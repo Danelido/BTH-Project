@@ -1,17 +1,14 @@
 #include "MasterRenderer.h"
 #include "Utility/MatrixCreator.h"
 #include "App/AppSettings.h"
-
+#include <iostream>
 MasterRenderer::MasterRenderer(FPSCamera* camera)
 {
 	m_camera = camera;
 	m_activeCamera = camera;
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_MULTISAMPLE);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
 
-	m_projectionMatrix = MatrixCreator::createNewProjectionMatrix(m_camera->FOV, (float)AppSettings::SRCWIDTH(), (float)AppSettings::SRCHEIGHT(), m_camera->NEAR_CLIPPING, m_camera->FAR_CLIPPING);
+	m_projectionMatrix = MatrixCreator::createNewProjectionMatrix(m_camera->FOV, (float)AppSettings::SRCWIDTH(), (float)AppSettings::SRCHEIGHT(), m_camera->NEAR_CLIPPING, 155.f);
 	
 	m_regularRenderer = new RegularRenderer(m_projectionMatrix);
 	m_instancedRenderer = new InstancedRenderer(m_projectionMatrix);
@@ -25,7 +22,7 @@ MasterRenderer::MasterRenderer(FPSCamera* camera)
 	
 	m_fboShader = new FBOShader();
 
-	m_sunPosition = glm::vec3(-1.f, 15.f, -1.f);
+	m_sunPosition = glm::vec3(0.f);
 
 	m_quadTreeDebugShader = new QuadTreeDebugShader();
 	m_quadTreeDebugShader->use();
@@ -33,6 +30,11 @@ MasterRenderer::MasterRenderer(FPSCamera* camera)
 	m_quadTreeDebugShader->unuse();
 
 	m_lights.reserve(AppSettings::MAXLIGHTS());
+
+	m_lightProj = glm::ortho(-10.f, 10.f, -10.f, 10.f, -1.0f, 30.f);
+	m_sunDirection = glm::vec3(128.f, 0.f, 250.f);
+	m_shadowMapShader = new ShadowMapShader();
+
 }
 
 
@@ -45,6 +47,7 @@ MasterRenderer::~MasterRenderer()
 	delete m_fboQuad;
 	delete m_fboShader;
 	delete m_quadTreeDebugShader;
+	delete m_shadowMapShader;
 }
 
 void MasterRenderer::submitEntity(Entity * entity)
@@ -74,10 +77,37 @@ void MasterRenderer::registerQuadTree(QuadTree * quadTree)
 	m_quadTree = quadTree;
 }
 
+void MasterRenderer::passAllEntitiesForShadowMapping(std::vector<Entity*>* allEntities)
+{
+	this->m_regularRenderer->passAllEntitiesForShadowMapping(allEntities);
+}
+
 void MasterRenderer::render()
 {
-	m_FBO->bindFramebuffer();
+	// Shadow mapping pass
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+	m_lightView = glm::lookAt(m_sunPosition,  m_sunDirection, glm::vec3(0.f, 1.0f, 0.f));
+	lightTransform = m_lightProj * m_lightView;
+
+	m_shadowMapShader->use();
+	m_shadowMapShader->setLightTransform(lightTransform);
+
+	glViewport(0, 0, AppSettings::SHADOW_WIDTH(), AppSettings::SHADOW_HEIGHT());
+	m_FBO->bindShadowFramebuffer();
+	glClear(GL_DEPTH_BUFFER_BIT);
 	
+	m_terrainRenderer->shadowMapPass(m_shadowMapShader);
+	m_regularRenderer->shadowMapPass(m_shadowMapShader);
+	m_FBO->unbindShadowFramebuffer();
+	m_shadowMapShader->unuse();
+	//----------------------------
+	glDisable(GL_CULL_FACE);
+
+	// Render to framebuffer ( Deferred )
+	glViewport(0, 0, AppSettings::SRCWIDTH(), AppSettings::SRCHEIGHT());
+	m_FBO->bindDeferredFramebuffer();
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -89,14 +119,14 @@ void MasterRenderer::render()
 	m_instancedRenderer->render(m_activeCamera, m_camera);
 	m_terrainRenderer->render(m_activeCamera, m_camera);
 	
-	m_FBO->unbindFramebuffer();
-
+	m_FBO->unbindDeferredFramebuffer();
+	//-------------------------------------
+	
+	// Render the scene texture to a quad
 	renderFBO();
 
 	m_lights.clear();
 
-
-	
 
 }
 
@@ -111,13 +141,15 @@ void MasterRenderer::renderFBO()
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	m_fboShader->use();
-	m_FBO->bindTexture();
+	m_FBO->bindDeferredTextures();
+	m_fboShader->setShadowBiaz(m_shadowBiaz);
 	m_fboShader->registerLights(&m_lights);
 	m_fboShader->setSunPosition(m_sunPosition);
 	m_fboShader->setCameraPosition(m_activeCamera->getPosition());
+	m_fboShader->setLightTransform(lightTransform);
 	m_fboQuad->bind();
 	glDrawArrays(GL_TRIANGLES, 0, m_fboQuad->getNumVertices());
-	m_FBO->unbindTexture();
+	m_FBO->unbindDeferredTextures();
 	m_fboQuad->unbind();
 	m_fboShader->unuse();
 }
@@ -138,5 +170,10 @@ void MasterRenderer::renderQuadTree()
 void MasterRenderer::setSunPosition(const glm::vec3& position)
 {
 	m_sunPosition = position;
+}
+
+void MasterRenderer::setShadowBiaz(const float & biaz)
+{
+	this->m_shadowBiaz = biaz;
 }
 

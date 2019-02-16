@@ -49,6 +49,18 @@ void TerrainRenderer::render(const FPSCamera* activeCamera, const FPSCamera* mai
 	m_chunks.clear();
 }
 
+void TerrainRenderer::shadowMapPass(ShadowMapShader * shader)
+{
+	for (size_t j = 0; j < m_chunks.size(); j++) {
+		glBindVertexArray(m_chunks[j]->getMesh()->getVao());
+		glEnableVertexAttribArray(0);
+		shader->setModelMatrix(m_modelMatrix);
+		glDrawElements(GL_TRIANGLES, m_chunks[j]->getMesh()->getIndicesSize(), GL_UNSIGNED_INT, NULL);
+		glDisableVertexAttribArray(0);
+		glBindVertexArray(NULL);
+	}
+}
+
 void TerrainRenderer::bindMesh(TerrainChunk * chunk)
 {
 	glBindVertexArray(chunk->getMesh()->getVao());

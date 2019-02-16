@@ -10,15 +10,21 @@ public:
 
 	void genFrameBuffer();
 
-	void bindFramebuffer();
-	void unbindFramebuffer();
-	void bindTexture();
-	void unbindTexture();
+	void bindShadowFramebuffer();
+	void unbindShadowFramebuffer();
+
+	void bindDeferredFramebuffer();
+	void unbindDeferredFramebuffer();
+	void bindDeferredTextures();
+	void unbindDeferredTextures();
 
 private:
 	void createDeferredShadingBuffers();
+	void createShadowMappingBuffers();
 	void genRenderBuffer();
+	
 	GLuint m_fbo;
+	GLuint m_shadowFbo;
 	GLuint m_texColorBuffer;
 	GLuint m_texDepthBuffer;
 	GLuint m_rbo;
@@ -26,6 +32,7 @@ private:
 	GLuint m_gPosition;
 	GLuint m_gNormal;
 	GLuint m_gAlbedoSpec;
+	GLuint m_depthMap; // For shadow-mapping
 };
 
 #endif

@@ -12,6 +12,7 @@ FBO::~FBO()
 
 void FBO::genFrameBuffer()
 {
+	// Deferred
 	glGenFramebuffers(1, &m_fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	createDeferredShadingBuffers();
@@ -22,19 +23,40 @@ void FBO::genFrameBuffer()
 		printf("Error creating framebuffer!\n");
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, NULL);
+
+	
+	// Shadow
+	glGenFramebuffers(1, &m_shadowFbo);
+	createShadowMappingBuffers();
+	
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		printf("Error creating framebuffer!\n");
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, NULL);
 }
 
-void FBO::bindFramebuffer()
+void FBO::bindShadowFramebuffer()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFbo);
 }
 
-void FBO::unbindFramebuffer()
+void FBO::unbindShadowFramebuffer()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, NULL);
 }
 
-void FBO::bindTexture()
+void FBO::bindDeferredFramebuffer()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+}
+
+void FBO::unbindDeferredFramebuffer()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, NULL);
+}
+
+void FBO::bindDeferredTextures()
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_gPosition);
@@ -42,15 +64,19 @@ void FBO::bindTexture()
 	glBindTexture(GL_TEXTURE_2D, m_gNormal);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, m_gAlbedoSpec);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, m_depthMap);
 }
 
-void FBO::unbindTexture()
+void FBO::unbindDeferredTextures()
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, NULL);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, NULL);
 	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, NULL);
+	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, NULL);
 }
 
@@ -95,4 +121,21 @@ void FBO::createDeferredShadingBuffers()
 	unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0 , GL_COLOR_ATTACHMENT1 , GL_COLOR_ATTACHMENT2 };
 	glDrawBuffers(3, attachments);
 
+}
+
+void FBO::createShadowMappingBuffers()
+{
+	glGenTextures(1, &m_depthMap);
+	glBindTexture(GL_TEXTURE_2D, m_depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, AppSettings::SHADOW_WIDTH(), AppSettings::SHADOW_HEIGHT(), 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.f, 1.f, 1.f, 1.f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
 }

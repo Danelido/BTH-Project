@@ -30,7 +30,7 @@ MainGame::MainGame()
 	m_jumpForce = 9.0f;
 	m_canJump = true;
 	m_ignoreQuadtree = false;
-	
+	m_shadowBiaz = 0.005f;
 	spawnObjects();
 	
 	m_entityManager->registerQuadtree(m_quadTree);
@@ -49,6 +49,7 @@ MainGame::~MainGame()
 	delete m_dbgCamera;
 	delete m_terrainChunkManager;
 	delete m_lightManager;
+	delete m_sun;
 }
 
 void MainGame::spawnObjects()
@@ -57,22 +58,14 @@ void MainGame::spawnObjects()
 	ParserData* boxData = m_parser->parseFile("Resources/Models/box.obj");
 	ParserData* treeData = m_parser->parseFile("Resources/Models/tree.obj");
 
-	// Choose if the entities is rendered with instancing or just regular ( 1 draw call per object )
-#define instanced 0
-#if instanced
-	InstancedMesh* m_treeMesh = m_loader->createInstancedMesh(treeData);
-#else
-	Mesh* m_treeMesh = m_loader->createMesh(treeData);
-#endif
-
-	// Mesh for the sun
+	// Mesh
 	Mesh* boxMesh = m_loader->createMesh(boxData);
 
 	// Setup a sun ( Visualized with a box )
-	m_sun = new Entity(boxMesh, glm::vec3(-1.f, 10.f, -1.f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 0.f));
+	m_sun = new Entity(boxMesh, glm::vec3(128.f, 16.f, 255.f), glm::vec3(0.5f, .5f, .5f), glm::vec3(0.f, 0.f, 0.f));
 	m_sunMoveSpeed = 10.f;
-	m_entityManager->add(m_sun);
-
+	//m_entityManager->add(m_sun);
+	
 	// Setup quadTree and terrain
 	XYZ p(128.f, 12.f, 128.f);
 	AABB boundary(p, 128.f);
@@ -81,24 +74,41 @@ void MainGame::spawnObjects()
 
 	float maxDist = 251;
 
-	// Entities
-	for (int i = 0; i < 10; i++)
-	{
-		float x = RandomNum::single(5.f, maxDist);
-		float z = RandomNum::single(5.f, maxDist);
-		float y = m_terrain->getHeight(glm::vec3(x, 0.f, z));
-		//float y = 0.f;
-		Entity* entity = new Entity(m_treeMesh,
-			glm::vec3(x, y - 0.5f, z),
-			glm::vec3(1.f, 1.f, 1.f),
-			glm::vec3(0.f, 0.f, 0.f));
+	// Entites in the shadow mapping area	
+	Entity* entity1 = new Entity(boxMesh,
+		glm::vec3(123.f, 2.5f, 250.f),
+		glm::vec3(1.f, 1.f, 1.f),
+		glm::vec3(25.f, 0.f, 60.f));
+	m_entityManager->add(entity1);
+	m_quadTree->insert(entity1);
+	
 
-		m_entityManager->add(entity);
-		m_quadTree->insert(entity);
-	}
+	Entity* entity2 = new Entity(boxMesh,
+		glm::vec3(133.f, 3.f, 250.f),
+		glm::vec3(1.2f, 0.75f, 1.f),
+		glm::vec3(25.f, 150.f, 60.f));
+	m_entityManager->add(entity2);
+	m_quadTree->insert(entity2);
+
+
+	Entity* entity3 = new Entity(boxMesh,
+		glm::vec3(123.f, 2.5f, 245.f),
+		glm::vec3(0.3f, 1.2f, 1.3f),
+		glm::vec3(125.f, 10.f, 160.f));
+	m_entityManager->add(entity3);
+	m_quadTree->insert(entity3);
+
+
+	Entity* entity4 = new Entity(boxMesh,
+		glm::vec3(133.f, 1.5f, 248.f),
+		glm::vec3(.5f, .5f, .5f),
+		glm::vec3(50.f, 60.f, 110.f));
+	m_entityManager->add(entity4);
+	m_quadTree->insert(entity4);
+	//-------------------------------------------
 
 	//Lights
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < AppSettings::MAXLIGHTS(); i++)
 	{
 		float x = RandomNum::single(5.f, maxDist);
 		float z = RandomNum::single(5.f, maxDist);
@@ -138,6 +148,8 @@ void MainGame::update(float dt)
 		glfwSwapInterval(1);
 	else
 		glfwSwapInterval(0);
+
+	m_masterRenderer->setShadowBiaz(m_shadowBiaz);
 }
 
 void MainGame::render()
@@ -188,6 +200,7 @@ void MainGame::renderImGUI(float dt)
 		ImGui::Text("Entities processed: %i", m_entityManager->entitiesProcessed());
 		ImGui::Text("Lights processed: %i", m_lightManager->getNrOfLightsProcessed());
 		ImGui::Text("Position: (%f, %f, %f)", m_fpsCamera->getPosition().x, m_fpsCamera->getPosition().y, m_fpsCamera->getPosition().z);
+		ImGui::Text("Sun position: (%f, %f, %f)",m_sun->getPosition().x, m_sun->getPosition().y, m_sun->getPosition().z);
 		ImGui::Text("Camera Up: (%f, %f, %f)", m_fpsCamera->getCameraUp().x, m_fpsCamera->getCameraUp().y, m_fpsCamera->getCameraUp().z);
 		ImGui::Text("C = Lock/Unlock camera");
 		ImGui::Text("WASD = Move around");
@@ -202,6 +215,7 @@ void MainGame::renderImGUI(float dt)
 		ImGui::Checkbox("Ignore quadtree", &m_ignoreQuadtree);
 		ImGui::SliderFloat("JumpForce", &m_jumpForce, 0.00f, 20.0f);
 		ImGui::SliderFloat("Gravity", &m_gravity, -20.f, 0.f);
+		ImGui::SliderFloat("Shadow biaz", &m_shadowBiaz, 0.0001f, 1.0f);
 	}
 	ImGui::End();
 
@@ -253,12 +267,13 @@ void MainGame::jumpFunc(float dt)
 
 void MainGame::moveSunFunc(float dt)
 {
+
 	glm::vec3 pos = m_sun->getPosition();
 	static float timer = 0.f;
 	timer += dt * 0.2f;
-	pos.x = (cosf(timer) * 260.f + 260.f) / 2.f;
-	pos.z = (sinf(timer) * 260.f + 260.f) / 2.f;
-	pos.y = 30.f;
+	//pos.x = (cosf(timer) * 260.f + 260.f) / 2.f;
+	//pos.z = (sinf(timer) * 260.f + 260.f) / 2.f;
+	//pos.y = 30.f;
 	if (Input::isKeyHeldDown(GLFW_KEY_KP_8)){
 		pos.x += m_sunMoveSpeed * dt;
 	}

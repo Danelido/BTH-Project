@@ -17,6 +17,16 @@ public:
 		return m_srcHeight;
 	}
 
+	inline static int SHADOW_WIDTH()
+	{
+		return m_shadowWidth;
+	}
+
+	inline static int SHADOW_HEIGHT()
+	{
+		return m_shadowHeight;
+	}
+
 	inline static int MAXLIGHTS()
 	{
 		return m_maxLights;
@@ -35,6 +45,8 @@ private:
 	void setSrcHeight(int height);
 	void setDebugLayer(bool b);
 
+	static int m_shadowWidth;
+	static int m_shadowHeight;
 	static int m_srcWidth;
 	static int m_srcHeight;
 	static int m_maxLights;

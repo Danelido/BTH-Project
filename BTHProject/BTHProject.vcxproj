@@ -177,6 +177,7 @@
     <ClCompile Include="Renderers\TerrainRenderer.cpp" />
     <ClCompile Include="Shader\FBOShader.cpp" />
     <ClCompile Include="Shader\QuadTreeDebugShader.cpp" />
+    <ClCompile Include="Shader\ShadowMapShader.cpp" />
     <ClCompile Include="Shader\TerrainShader.cpp" />
     <ClCompile Include="Terrain\TerrainChunk.cpp" />
     <ClCompile Include="Terrain\TerrainChunkManager.cpp" />
@@ -230,6 +231,7 @@
     <ClInclude Include="Renderers\TerrainRenderer.h" />
     <ClInclude Include="Shader\FBOShader.h" />
     <ClInclude Include="Shader\QuadTreeDebugShader.h" />
+    <ClInclude Include="Shader\ShadowMapShader.h" />
     <ClInclude Include="Shader\TerrainShader.h" />
     <ClInclude Include="Terrain\TerrainChunk.h" />
     <ClInclude Include="Terrain\TerrainChunkManager.h" />

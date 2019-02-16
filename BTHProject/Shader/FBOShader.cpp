@@ -11,6 +11,8 @@ FBOShader::FBOShader()
 	m_cameraPositionLocation = glGetUniformLocation(program(), "cameraPos");
 	m_numberOfLightsLocation = glGetUniformLocation(program(), "nrOfLights");
 	m_sunPositionLocation = glGetUniformLocation(program(), "sunPosition");
+	m_lightTransformLocation = glGetUniformLocation(program(), "lightTransform");
+	m_shadowBiazLocation = glGetUniformLocation(program(), "shadowBiaz");
 
 	for (int i = 0; i < AppSettings::MAXLIGHTS(); i++)
 	{
@@ -29,6 +31,7 @@ FBOShader::FBOShader()
 	glUniform1i(glGetUniformLocation(program(), "gPosition"),0);
 	glUniform1i(glGetUniformLocation(program(), "gNormal"), 1);
 	glUniform1i(glGetUniformLocation(program(), "gAlbedoSpec"), 2);
+	glUniform1i(glGetUniformLocation(program(), "depthmap"), 3);
 
 	unuse();
 }
@@ -69,4 +72,14 @@ void FBOShader::registerLights(const std::vector<Light*>* lights)
 			lights->at(i)->getRadius());
 	}
 	
+}
+
+void FBOShader::setLightTransform(const glm::mat4 & lightTransform)
+{
+	glUniformMatrix4fv(m_lightTransformLocation, 1, GL_FALSE, &lightTransform[0][0]);
+}
+
+void FBOShader::setShadowBiaz(const float & biaz)
+{
+	glUniform1f(m_shadowBiazLocation, biaz);
 }

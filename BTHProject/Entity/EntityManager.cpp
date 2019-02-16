@@ -61,6 +61,8 @@ void EntityManager::update(float dt, const FPSCamera* camera, MasterRenderer* ma
 		}
 	}
 
+	masterRenderer->passAllEntitiesForShadowMapping(&m_entities);
+
 }
 
 void EntityManager::setIgnoreQuadTree(bool b)

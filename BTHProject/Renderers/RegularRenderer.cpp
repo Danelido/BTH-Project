@@ -33,6 +33,11 @@ void RegularRenderer::submit(Entity * entity)
 	
 }
 
+void RegularRenderer::passAllEntitiesForShadowMapping(std::vector<Entity*>* allEntities)
+{
+	m_entitiesShadowPassVector = allEntities;
+}
+
 void RegularRenderer::render(const FPSCamera * activeCamera, const FPSCamera* mainCamera)
 {
 	if (m_meshes.size() == 0)
@@ -57,10 +62,47 @@ void RegularRenderer::render(const FPSCamera * activeCamera, const FPSCamera* ma
 	m_meshes.clear();
 }
 
+void RegularRenderer::shadowMapPass(ShadowMapShader* shader)
+{
+	if (m_entitiesShadowPassVector == nullptr || m_entitiesShadowPassVector->size() == 0)
+		return;
+
+	for (auto entity : *m_entitiesShadowPassVector)
+	{
+		glBindVertexArray(entity->getMesh()->getVao());
+		glEnableVertexAttribArray(0);
+		shader->setModelMatrix(entity->getModelMatrix());
+		glDrawElements(GL_TRIANGLES, entity->getMesh()->getIndicesSize(), GL_UNSIGNED_INT, NULL);
+		glDisableVertexAttribArray(0);
+		glBindVertexArray(NULL);
+	}
+
+	/*
+	if (m_meshes.size() == 0)
+		return;*/
+
+	/*for (auto &meshMap : m_meshes)
+	{
+		glBindVertexArray(meshMap.first->getVao());
+		glEnableVertexAttribArray(0);
+
+		for (auto entity : meshMap.second)
+		{
+			shader->setModelMatrix(entity->getModelMatrix());
+			glDrawElements(GL_TRIANGLES, entity->getMesh()->getIndicesSize(), GL_UNSIGNED_INT, NULL);
+		}
+
+		glDisableVertexAttribArray(0);
+		glBindVertexArray(NULL);
+	}
+
+*/
+
+}
+
 void RegularRenderer::bindMesh(Mesh * mesh, const FPSCamera* camera)
 {
 	glBindVertexArray(mesh->getVao());
-
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);

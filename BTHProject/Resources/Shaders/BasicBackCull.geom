@@ -23,12 +23,17 @@ bool checkCulling(int index)
 {
     vec4 worldVertexPos = modelMatrix * vec4(vs_data[index].position, 1.0f);
     vec3 toCamera = normalize(cameraPos - worldVertexPos.xyz);
-    
-    float d = dot(toCamera, vs_data[index].normal);
-    if(d >= 0.0f)
+
+    vec3 v1 = (modelMatrix * vec4(vs_data[1].position, 1.0f)).xyz -  (modelMatrix * vec4(vs_data[0].position, 1.0f)).xyz;
+    vec3 v2 = (modelMatrix * vec4(vs_data[2].position, 1.0f)).xyz -  (modelMatrix * vec4(vs_data[0].position, 1.0f)).xyz;
+    vec3 n = normalize(cross(v1, v2));
+
+
+    float d = dot(toCamera, n);
+    if(d > 0.0f)
     {
        gl_Position = projectionMatrix * viewMatrix * worldVertexPos;
-       frag_normal = vs_data[index].normal;
+       frag_normal = n;
        frag_uv = vs_data[index].uv;
        frag_objectPos = worldVertexPos.xyz;
        EmitVertex();

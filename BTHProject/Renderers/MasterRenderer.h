@@ -17,6 +17,8 @@
 #include "InstancedRenderer.h"
 #include "TerrainRenderer.h"
 
+#include "Shader/ShadowMapShader.h"
+
 class MasterRenderer
 {
 public:
@@ -27,7 +29,9 @@ public:
 	void submitLight(Light* light);
 	void submitTerrain(TerrainChunk* chunk);
 	void registerQuadTree(QuadTree* quadTree);
+	void passAllEntitiesForShadowMapping(std::vector<Entity*>* allEntities);
 	void setSunPosition(const glm::vec3& position);
+	void setShadowBiaz(const float& biaz);
 	void render();
 	void changeCamera(FPSCamera * camera);
 	
@@ -37,9 +41,16 @@ private:
 private:
 	FBOShader* m_fboShader;
 	QuadTreeDebugShader* m_quadTreeDebugShader;
+	ShadowMapShader* m_shadowMapShader;
+	glm::mat4 m_lightProj;
+	glm::mat4 m_lightView;
+	glm::mat4 lightTransform;
 	FBO* m_FBO;
 	Quad* m_fboQuad;
 	
+	float m_shadowBiaz;
+	glm::vec3 m_sunDirection;
+
 	glm::mat4 m_projectionMatrix;
 	FPSCamera* m_camera;
 	FPSCamera* m_activeCamera;

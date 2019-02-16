@@ -14,7 +14,7 @@ Terrain::Terrain(Loader* loader, TerrainChunkManager* chunkManager, QuadTree* qu
 	m_size = 1.f;
 	m_heightScaleDivider = 14;
 	GLint width, height, channels;
-	const char* filename = "Resources/Textures/heightmap.png";
+	const char* filename = "Resources/Textures/heightmap2.png";
 	stbi_set_flip_vertically_on_load(0);
 	unsigned char* textureData = stbi_load(filename, &width, &height, &channels, STBI_rgb);
 
@@ -253,7 +253,6 @@ void Terrain::generateTerrainCells(int nodeX, int nodeY, int cellWidth, int cell
 	
 	if (nodeY == 15)
 	{
-
 		col -= 3;
 	}
 

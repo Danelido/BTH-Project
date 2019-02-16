@@ -46,6 +46,7 @@ private:
 	bool m_vSync;
 	bool m_dbgCameraActive;
 	bool m_ignoreQuadtree;
+	float m_shadowBiaz;
 
 	// Sun
 	Entity* m_sun;
