@@ -25,7 +25,7 @@ private:
 	glm::vec3 calculateNormals(TerrainData v1, TerrainData v2, TerrainData v3);
 	void smoothNormals();
 	void generateTerrain();
-	void generateTerrainCells(int nodeX, int nodeY, int cellWidth, int cellHeight, std::vector<GLuint> textureIDs);
+	void generateTerrainCells(int nodeX, int nodeY, int cellWidth, int cellHeight, int cellCount, std::vector<GLuint> textureIDs);
 private:
 	Loader* m_loader;
 	QuadTree* m_quadTree;
@@ -42,6 +42,10 @@ private:
 	bool m_loadedSuccessful;
 	
 	glm::mat4 m_modelMatrix;
+
+	// Testing
+private:
+	
 
 };
 

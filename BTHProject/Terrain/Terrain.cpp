@@ -23,6 +23,9 @@ Terrain::Terrain(Loader* loader, TerrainChunkManager* chunkManager, QuadTree* qu
 		loadHeightsFromHeightmap(textureData, width,height,channels);
 		smoothNormals();
 		generateTerrain();
+
+		//createVerticesAndNormals(textureData, width, height, channels);
+
 		m_loadedSuccessful = true;
 	}
 	else
@@ -222,59 +225,96 @@ void Terrain::generateTerrain()
 	textures.emplace_back("Resources/Textures/granite.png");
 	std::vector<GLuint> textureIDS = m_loader->createTexture(textures);
 	
+	int cellWidth = 8;
+	int cellHeight = 8;
+	int cellCount = (m_terrainWidth) / (cellWidth);
+	m_chunkManager->reserveVectorMemory(cellCount * cellCount);
 
-	int cellWidth = 17;
-	int cellHeight = 17;
-	int cellRowCount = (m_terrainWidth - 1) / (cellWidth - 1);
-	int cellCount = cellRowCount * cellRowCount;
-	m_chunkManager->reserveVectorMemory(cellCount);
-
-	for (int j = 0; j <= cellRowCount; j++)
+	for (int z = 0; z < cellCount; z++)
 	{
-
-		for (int i = 0; i <= cellRowCount; i++)
+		for (int x = 0; x < cellCount; x++)
 		{
-			int index = (cellRowCount * j) + i;
-			generateTerrainCells(i, j, cellWidth, cellHeight, textureIDS);
-		
+			generateTerrainCells(x, z, cellWidth, cellHeight, cellCount, textureIDS);
 		}
 	}
+
+
 }
 
-void Terrain::generateTerrainCells(int nodeX, int nodeY, int cellWidth, int cellHeight, std::vector<GLuint> textureIDs)
+void Terrain::generateTerrainCells(int nodeX, int nodeY, int cellWidth, int cellHeight, int cellCount, std::vector<GLuint> textureIDs)
 {
 	ParserData* cellData = new ParserData();
 
-	int dataIndex = ((nodeX * (cellWidth-1)) + (nodeY * (cellHeight-1) * (m_terrainWidth - 1))) * 18;
-	int uvIndex = ((nodeX * (cellWidth-1)) + (nodeY * (cellHeight-1) * (m_terrainWidth - 1))) * 12;
+	int actualWidth = (m_terrainWidth - 1) * 18; // 6 vertices adn 3 floats per vertices = 18
+	int actualCellwidth = cellWidth * 18;
+
+	int uvWidth = (m_terrainWidth - 1) * 12; // 6 vertices and 2 floats
+	int uvCellWidth = cellWidth * 12;
+
+	int currentIndex = ((nodeX * actualCellwidth) + actualWidth * (nodeY * cellHeight));
+	int currentUVIndex = ((nodeX * uvCellWidth) + uvWidth * (nodeY * cellHeight));
 	int index = 0;
+
+	int row = cellWidth;
 	int col = cellHeight;
-	int row = (cellWidth - 1) * 6;
 	
-	if (nodeY == 15)
+	for (int z = 0; z < cellHeight; z++)
 	{
-		col -= 3;
-	}
+		// To keep it from oversampling on the absolute last iteration.
+		// I don't know why it does that..
+		if (nodeX == cellCount - 1 && z == cellHeight - 1)
+			row = cellWidth - 1;
+
+		if (nodeY == cellCount - 1 && z == cellHeight - 1)
+			break;
+
+		for (int x = 0; x < row; x++) {
+			// The absolute last iteration is somehow oversampling outside the vector bounds so just break
+			if (nodeX == cellCount - 1 && x == row - 1 && nodeY == cellCount - 1 && z == cellHeight - 2)
+				break;
 
 
-	for (int j = 0; j < col; j++)
-	{
+			// This is 1 by 1 square
+			cellData->addVertex(m_data->getVertices().at(currentIndex), m_data->getVertices().at(currentIndex + 1), m_data->getVertices().at(currentIndex + 2));
+			cellData->addVertex(m_data->getVertices().at(currentIndex + 3), m_data->getVertices().at(currentIndex + 4), m_data->getVertices().at(currentIndex + 5));
+			cellData->addVertex(m_data->getVertices().at(currentIndex + 6), m_data->getVertices().at(currentIndex + 7), m_data->getVertices().at(currentIndex + 8));
 
-		for (int i = 0; i < row; i++)
-		{
-			cellData->addVertex(m_data->getVertices().at(dataIndex), m_data->getVertices().at(dataIndex + 1), m_data->getVertices().at(dataIndex + 2));
-			cellData->addNormal(m_data->getNormals().at(dataIndex), m_data->getNormals().at(dataIndex + 1), m_data->getNormals().at(dataIndex + 2));
-			cellData->addUV(m_data->getUvs().at(uvIndex), m_data->getUvs().at(uvIndex + 1));
+			cellData->addVertex(m_data->getVertices().at(currentIndex + 9), m_data->getVertices().at(currentIndex + 10), m_data->getVertices().at(currentIndex + 11));
+			cellData->addVertex(m_data->getVertices().at(currentIndex + 12), m_data->getVertices().at(currentIndex + 13), m_data->getVertices().at(currentIndex + 14));
+			cellData->addVertex(m_data->getVertices().at(currentIndex + 15), m_data->getVertices().at(currentIndex + 16), m_data->getVertices().at(currentIndex + 17));
+			//---------------------------
+
+			cellData->addNormal(m_data->getNormals().at(currentIndex), m_data->getNormals().at(currentIndex + 1), m_data->getNormals().at(currentIndex + 2));
+			cellData->addNormal(m_data->getNormals().at(currentIndex + 3), m_data->getNormals().at(currentIndex + 4), m_data->getNormals().at(currentIndex + 5));
+			cellData->addNormal(m_data->getNormals().at(currentIndex + 6), m_data->getNormals().at(currentIndex + 7), m_data->getNormals().at(currentIndex + 8));
+
+			cellData->addNormal(m_data->getNormals().at(currentIndex + 9), m_data->getNormals().at(currentIndex + 10), m_data->getNormals().at(currentIndex + 11));
+			cellData->addNormal(m_data->getNormals().at(currentIndex + 12), m_data->getNormals().at(currentIndex + 13), m_data->getNormals().at(currentIndex + 14));
+			cellData->addNormal(m_data->getNormals().at(currentIndex + 15), m_data->getNormals().at(currentIndex + 16), m_data->getNormals().at(currentIndex + 17));
+
+			cellData->addUV(m_data->getUvs().at(currentUVIndex), m_data->getUvs().at(currentUVIndex + 1));
+			cellData->addUV(m_data->getUvs().at(currentUVIndex + 2), m_data->getUvs().at(currentUVIndex + 3));
+			cellData->addUV(m_data->getUvs().at(currentUVIndex + 4), m_data->getUvs().at(currentUVIndex + 5));
+			
+			cellData->addUV(m_data->getUvs().at(currentUVIndex + 6), m_data->getUvs().at(currentUVIndex + 7));
+			cellData->addUV(m_data->getUvs().at(currentUVIndex + 8), m_data->getUvs().at(currentUVIndex + 9));
+			cellData->addUV(m_data->getUvs().at(currentUVIndex + 10), m_data->getUvs().at(currentUVIndex + 11));
+
+
+			cellData->addIndices(index++);
+			cellData->addIndices(index++);
 			cellData->addIndices(index++);
 
-			dataIndex += 3;
-			uvIndex += 2;
+			cellData->addIndices(index++);
+			cellData->addIndices(index++);
+			cellData->addIndices(index++);
+			currentIndex += 18;
+			currentUVIndex += 12;
 		}
-
-		dataIndex += ((m_terrainWidth * 6) - ((cellWidth) * 6)) * 3;
-		uvIndex += ((m_terrainWidth * 6) - ((cellWidth) * 6)) * 2;
+		currentIndex += (actualWidth - actualCellwidth);
+		currentUVIndex += (uvWidth - uvCellWidth);
 	}
-
+	
 	TerrainChunk* chunk = new TerrainChunk(cellData, m_loader, textureIDs, cellWidth);
 	m_chunkManager->addChunk(chunk); 
 	m_quadTree->insert(chunk);

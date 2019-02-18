@@ -8,7 +8,7 @@ MasterRenderer::MasterRenderer(FPSCamera* camera)
 	m_activeCamera = camera;
 	glEnable(GL_DEPTH_TEST);
 
-	m_projectionMatrix = MatrixCreator::createNewProjectionMatrix(m_camera->FOV, (float)AppSettings::SRCWIDTH(), (float)AppSettings::SRCHEIGHT(), m_camera->NEAR_CLIPPING, 155.f);
+	m_projectionMatrix = MatrixCreator::createNewProjectionMatrix(m_camera->FOV, (float)AppSettings::SRCWIDTH(), (float)AppSettings::SRCHEIGHT(), m_camera->NEAR_CLIPPING, m_camera->FAR_CLIPPING);
 	
 	m_regularRenderer = new RegularRenderer(m_projectionMatrix);
 	m_instancedRenderer = new InstancedRenderer(m_projectionMatrix);
@@ -108,7 +108,7 @@ void MasterRenderer::render()
 	// Render to framebuffer ( Deferred )
 	glViewport(0, 0, AppSettings::SRCWIDTH(), AppSettings::SRCHEIGHT());
 	m_FBO->bindDeferredFramebuffer();
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(137.f/255.f, 207.f / 255.f, 240.f/255.f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	

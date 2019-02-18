@@ -240,7 +240,7 @@ void MainGame::jumpFunc(float dt)
 	if (m_terrainWalk && m_terrain)
 	{
 		float cameraY = m_fpsCamera->getPosition().y;
-		float targetY = m_terrain->getHeight(m_fpsCamera->getPosition()) + 2.f;
+		float targetY = m_terrain->getHeight(m_fpsCamera->getPosition()) + 3.f;
 
 		cameraY += m_upAcceleration * dt;
 		m_fpsCamera->setY(cameraY);
