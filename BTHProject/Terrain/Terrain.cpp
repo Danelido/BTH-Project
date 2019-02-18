@@ -14,7 +14,7 @@ Terrain::Terrain(Loader* loader, TerrainChunkManager* chunkManager, QuadTree* qu
 	m_size = 1.f;
 	m_heightScaleDivider = 14;
 	GLint width, height, channels;
-	const char* filename = "Resources/Textures/heightmap2.png";
+	const char* filename = "Resources/Textures/heightmap.png";
 	stbi_set_flip_vertically_on_load(0);
 	unsigned char* textureData = stbi_load(filename, &width, &height, &channels, STBI_rgb);
 
@@ -218,7 +218,7 @@ void Terrain::generateTerrain()
 	}
 
 	std::vector<std::string> textures;
-	textures.emplace_back("Resources/Textures/blendmap2.png");
+	textures.emplace_back("Resources/Textures/blendmap.png");
 	textures.emplace_back("Resources/Textures/grass.png");
 	textures.emplace_back("Resources/Textures/muddy.png");
 	textures.emplace_back("Resources/Textures/stone.png");

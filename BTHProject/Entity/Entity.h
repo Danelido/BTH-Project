@@ -16,6 +16,7 @@ public:
 	void setPosition(const glm::vec3& position);
 	void setRotation(const glm::vec3& rotation);
 	void setScale(const glm::vec3& scale);
+	void setBoundaryManually(float width, float height, float depth);
 	void updateBoundary();
 	GLuint getDebugVAO();
 	const glm::vec3& getPosition() const;
@@ -39,9 +40,11 @@ private:
 	void updateModelMatrix();
 
 	// DEBUG
-	GLuint m_vao;
-	GLuint m_vbo;
-	bool m_hasBeenSetUp = false;;
+	GLuint m_vao = 0;
+	GLuint m_vbo = 0;
+	bool m_hasBeenSetUp = false;
+	bool m_updateBoundaryDebugLines;
+	bool m_hasManuallySetBoundary = false;
 };
 
 #endif

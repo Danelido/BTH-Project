@@ -49,41 +49,60 @@ void Entity::setScale(const glm::vec3 & scale)
 {
 	m_scale = scale;
 	updateBoundary();
+	m_updateBoundaryDebugLines = true;
 	updateModelMatrix();
+}
+
+void Entity::setBoundaryManually(float width, float height, float depth)
+{
+	m_updateBoundaryDebugLines = true;
+	m_hasManuallySetBoundary = true;
+	m_boundary->halfDimensions.x = width / 2.f;
+	m_boundary->halfDimensions.y = height / 2.f;
+	m_boundary->halfDimensions.z = depth / 2.f;
+
+	m_boundary->center.x = m_position.x;
+	m_boundary->center.y = m_position.y + height / 2.f;
+	m_boundary->center.z = m_position.z;
+
+	updateBoundary();
 }
 
 void Entity::updateBoundary()
 {
-	if (m_rotation.x != 0.f || m_rotation.y != 0.f || m_rotation.z != 0.f) {
-		float largestScale = m_scale.x;
-
-		largestScale = (largestScale > m_scale.y) ? largestScale : m_scale.y;
-		largestScale = (largestScale > m_scale.z) ? largestScale : m_scale.z;
-
-		largestScale *= 1.75f;
-
-		m_boundary->halfDimensions.x = largestScale;
-		m_boundary->halfDimensions.y = largestScale;
-		m_boundary->halfDimensions.z = largestScale;
-
-	}
-	else
+	if (!m_hasManuallySetBoundary)
 	{
-		m_boundary->halfDimensions.x = m_scale.x;
-		m_boundary->halfDimensions.y = m_scale.y;
-		m_boundary->halfDimensions.z = m_scale.z;
+		if (m_rotation.x != 0.f || m_rotation.y != 0.f || m_rotation.z != 0.f) {
+			float largestScale = m_scale.x;
+
+			largestScale = (largestScale > m_scale.y) ? largestScale : m_scale.y;
+			largestScale = (largestScale > m_scale.z) ? largestScale : m_scale.z;
+
+			largestScale *= 1.75f;
+
+			m_boundary->halfDimensions.x = largestScale;
+			m_boundary->halfDimensions.y = largestScale;
+			m_boundary->halfDimensions.z = largestScale;
+
+		}
+		else
+		{
+			m_boundary->halfDimensions.x = m_scale.x;
+			m_boundary->halfDimensions.y = m_scale.y;
+			m_boundary->halfDimensions.z = m_scale.z;
+		}
+
+		m_boundary->center.x = m_position.x;
+		m_boundary->center.y = m_position.y;
+		m_boundary->center.z = m_position.z;
 	}
-
-
 	
-	m_boundary->center.x = m_position.x;
-	m_boundary->center.y = m_position.y;
-	m_boundary->center.z = m_position.z;
 	
-	if (AppSettings::DEBUG_LAYER() && !m_hasBeenSetUp) {
+	
+	if (AppSettings::DEBUG_LAYER() && !m_hasBeenSetUp || m_updateBoundaryDebugLines) {
 		
 		m_hasBeenSetUp = true;
-
+		m_updateBoundaryDebugLines = false;
 		float data[24 * 3] =
 		{
 			// FIRST RECTANGLE
@@ -207,10 +226,10 @@ void Entity::updateBoundary()
 		};
 
 	
-
-		glGenVertexArrays(1, &m_vao);
-		glGenBuffers(1, &m_vbo);
-
+		if (m_vao == 0) {
+			glGenVertexArrays(1, &m_vao);
+			glGenBuffers(1, &m_vbo);
+		}
 		glBindVertexArray(m_vao);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(data), &data, GL_STATIC_DRAW);

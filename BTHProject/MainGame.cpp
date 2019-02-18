@@ -57,14 +57,21 @@ void MainGame::spawnObjects()
 	// Parse some data
 	ParserData* boxData = m_parser->parseFile("Resources/Models/box.obj");
 	ParserData* treeData = m_parser->parseFile("Resources/Models/tree.obj");
+	
+	ParserData* boatData = m_parser->parseFile("Resources/Models/boat.obj");
+
 
 	// Mesh
 	Mesh* boxMesh = m_loader->createMesh(boxData);
+	Mesh* boatMesh = m_loader->createMesh(boatData);
 
 	// Setup a sun ( Visualized with a box )
-	m_sun = new Entity(boxMesh, glm::vec3(128.f, 16.f, 255.f), glm::vec3(0.5f, .5f, .5f), glm::vec3(0.f, 0.f, 0.f));
+	m_sun = new Entity(boxMesh, glm::vec3(128.f, 16.f, 255.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(0.f, 0.f, 0.f));
 	m_sunMoveSpeed = 10.f;
-	//m_entityManager->add(m_sun);
+	
+	
+	
+	
 	
 	// Setup quadTree and terrain
 	XYZ p(128.f, 12.f, 128.f);
@@ -72,6 +79,10 @@ void MainGame::spawnObjects()
 	m_quadTree = new QuadTree(boundary, m_fpsCamera);
 	m_terrain = new Terrain(m_loader, m_terrainChunkManager, m_quadTree);
 
+	Entity* boat = new Entity(boatMesh, glm::vec3(128.f, 0.f, 225.f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.f, 0.f, 0.f));
+	boat->setBoundaryManually(8.f, 10.f, 10.f);
+	m_entityManager->add(boat);
+	m_quadTree->insert(boat);
 	float maxDist = 251;
 
 	// Entites in the shadow mapping area	
@@ -108,7 +119,7 @@ void MainGame::spawnObjects()
 	//-------------------------------------------
 
 	//Lights
-	for (int i = 0; i < AppSettings::MAXLIGHTS(); i++)
+	for (int i = 0; i < 50; i++)
 	{
 		float x = RandomNum::single(5.f, maxDist);
 		float z = RandomNum::single(5.f, maxDist);

@@ -8,7 +8,7 @@ class FPSCamera
 {
 public:
 	const float NEAR_CLIPPING = 0.1f;
-	const float FAR_CLIPPING = 60.f;
+	const float FAR_CLIPPING = 90.f;
 	const float FOV = 45.f;
 
 public:

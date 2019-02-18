@@ -44,6 +44,9 @@ ParserData * Parser::parseFile(const std::string & filepath)
 	{
 		std::vector<std::string> attribs = split(line, ' ');
 
+		if (attribs.size() == 0)
+			continue;
+
 		if (attribs[0] == "mtllib")
 		{
 			MTLfile = attribs[1];
