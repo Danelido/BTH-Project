@@ -141,6 +141,12 @@
     <ClCompile Include="Shader\ShadowMapShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Particle\ParticleManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\ParticleShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainGame.h">
@@ -278,6 +284,12 @@
     <ClInclude Include="Shader\ShadowMapShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Particle\ParticleManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\ParticleShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\TerrainShader.vert" />
@@ -293,5 +305,7 @@
     <None Include="Resources\Shaders\instancedBackCull.geom" />
     <None Include="Resources\Shaders\TerrainBackCull.geom" />
     <None Include="Resources\Shaders\BasicBackCull.geom" />
+    <None Include="Resources\Shaders\Particles.vert" />
+    <None Include="Resources\Shaders\Particles.frag" />
   </ItemGroup>
 </Project>

@@ -17,6 +17,8 @@ public:
 	void unbindDeferredFramebuffer();
 	void bindDeferredTextures();
 	void unbindDeferredTextures();
+	
+	const GLuint gBuffer() const;
 
 private:
 	void createDeferredShadingBuffers();

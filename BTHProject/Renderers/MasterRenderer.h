@@ -50,8 +50,6 @@ private:
 	
 	float m_shadowBiaz;
 	glm::vec3 m_sunDirection;
-
-	glm::mat4 m_projectionMatrix;
 	FPSCamera* m_camera;
 	FPSCamera* m_activeCamera;
 

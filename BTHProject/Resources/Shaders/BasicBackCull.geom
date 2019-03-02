@@ -24,10 +24,7 @@ bool checkCulling(int index)
     vec4 worldVertexPos = modelMatrix * vec4(vs_data[index].position, 1.0f);
     vec3 toCamera = normalize(cameraPos - worldVertexPos.xyz);
 
-    vec3 v1 = (modelMatrix * vec4(vs_data[1].position, 1.0f)).xyz -  (modelMatrix * vec4(vs_data[0].position, 1.0f)).xyz;
-    vec3 v2 = (modelMatrix * vec4(vs_data[2].position, 1.0f)).xyz -  (modelMatrix * vec4(vs_data[0].position, 1.0f)).xyz;
-    vec3 n = normalize(cross(v1, v2));
-
+	vec3 n = mat3(transpose(inverse(modelMatrix))) * vs_data[index].normal;
 
     float d = dot(toCamera, n);
     if(d > 0.0f)

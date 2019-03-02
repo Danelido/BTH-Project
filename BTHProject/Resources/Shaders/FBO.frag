@@ -37,8 +37,8 @@ float shadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 fragPos)
 	if(projCoords.z > 1.0f)
 		return 0.0f;
 	
-	// get the closest dept value from lights perspective( using 0, 1 range fom fragposLight as coords)
-	float closestDepth = texture(depthmap, projCoords.xy).r;//LinearizeDepth(projCoords.xy);
+	// get the closest depth value from lights perspective( using 0, 1 range fom fragposLight as coords)
+	float closestDepth = texture(depthmap, projCoords.xy).r;
 	
 	// get depth of current fragment from lights perspective
 	float currentDepth = projCoords.z;
@@ -117,6 +117,5 @@ void main()
 
 	// Clamp it
 	finalColor = min(currentColor, vec4(1.f, 1.f, 1.f,1.f)) * vec4(albedo, 1.0f);
-
 }
 

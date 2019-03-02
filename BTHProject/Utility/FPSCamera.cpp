@@ -1,6 +1,7 @@
 #include "FPSCamera.h"
 #include "Input.h"
 #include "App/AppSettings.h"
+#include "MatrixCreator.h"
 #include <GLM/gtx/transform.hpp>
 #include <GLM/gtc/matrix_transform.hpp>
 #include <iostream>
@@ -18,6 +19,7 @@ FPSCamera::FPSCamera(const glm::vec3& position)
 	m_cameraActive = true;
 	m_freeLook = true;
 	m_debugCamera = false;
+	m_projectionMatrix = MatrixCreator::createNewProjectionMatrix(FOV, (float)AppSettings::SRCWIDTH(), (float)AppSettings::SRCHEIGHT(), NEAR_CLIPPING, FAR_CLIPPING);
 	for (size_t i = 0; i < 4; i++)
 	{
 		m_nearPlanePoints[i] = glm::vec4(0.f);
@@ -109,6 +111,11 @@ bool FPSCamera::insideFrustum(const glm::vec3& pos, float radius)
 const glm::mat4& FPSCamera::getViewMatrix() const
 {
 	return m_viewMatrix;
+}
+
+const glm::mat4& FPSCamera::getProjectionMatrix() const
+{
+	return m_projectionMatrix;
 }
 
 const glm::vec3 & FPSCamera::getPosition() const

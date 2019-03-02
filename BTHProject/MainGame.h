@@ -10,6 +10,7 @@
 #include "Terrain/Terrain.h"
 #include "Acceleration/QuadTree.h"
 #include "Terrain/TerrainChunkManager.h"
+#include "Particle/ParticleManager.h"
 
 class MainGame
 {
@@ -32,6 +33,7 @@ private:
 	FPSCamera * m_fpsCamera;
 	FPSCamera* m_dbgCamera;
 	FPSCamera* m_activeCamera; // Just points to the active camera
+	ParticleManager* m_particleManager;
 	EntityManager* m_entityManager;
 	TerrainChunkManager* m_terrainChunkManager;
 	Terrain* m_terrain;

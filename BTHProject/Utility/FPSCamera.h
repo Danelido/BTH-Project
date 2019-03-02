@@ -20,6 +20,7 @@ public:
 	bool insideFrustum(AABB& aabb);
 	bool insideFrustum(const glm::vec3& pos, float radius);
 	const glm::mat4& getViewMatrix() const;
+	const glm::mat4& getProjectionMatrix() const;
 	const glm::vec3& getPosition() const;
 	const glm::vec3& getCameraUp() const;
 	void setY(float y);
@@ -53,6 +54,7 @@ private:
 	glm::vec3 m_cameraUp;
 	glm::vec3 m_right;
 	glm::mat4 m_viewMatrix;
+	glm::mat4 m_projectionMatrix;
 	float m_pitch;
 	float m_yaw;
 	float m_sensitivity;

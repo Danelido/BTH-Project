@@ -20,7 +20,7 @@ void FBO::genFrameBuffer()
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
-		printf("Error creating framebuffer!\n");
+		printf("Error creating deferred framebuffer!\n");
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, NULL);
 
@@ -31,7 +31,7 @@ void FBO::genFrameBuffer()
 	
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
-		printf("Error creating framebuffer!\n");
+		printf("Error creating shadow framebuffer!\n");
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, NULL);
 }
@@ -54,6 +54,11 @@ void FBO::bindDeferredFramebuffer()
 void FBO::unbindDeferredFramebuffer()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, NULL);
+}
+
+const GLuint FBO::gBuffer() const
+{
+	return m_fbo;
 }
 
 void FBO::bindDeferredTextures()

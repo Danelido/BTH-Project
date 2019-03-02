@@ -6,13 +6,12 @@ MasterRenderer::MasterRenderer(FPSCamera* camera)
 {
 	m_camera = camera;
 	m_activeCamera = camera;
-	glEnable(GL_DEPTH_TEST);
-
-	m_projectionMatrix = MatrixCreator::createNewProjectionMatrix(m_camera->FOV, (float)AppSettings::SRCWIDTH(), (float)AppSettings::SRCHEIGHT(), m_camera->NEAR_CLIPPING, m_camera->FAR_CLIPPING);
 	
-	m_regularRenderer = new RegularRenderer(m_projectionMatrix);
-	m_instancedRenderer = new InstancedRenderer(m_projectionMatrix);
-	m_terrainRenderer = new TerrainRenderer(m_projectionMatrix);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	m_regularRenderer = new RegularRenderer(camera->getProjectionMatrix());
+	m_instancedRenderer = new InstancedRenderer(camera->getProjectionMatrix());
+	m_terrainRenderer = new TerrainRenderer(camera->getProjectionMatrix());
 
 	m_FBO = new FBO();
 	m_FBO->genFrameBuffer();
@@ -26,7 +25,7 @@ MasterRenderer::MasterRenderer(FPSCamera* camera)
 
 	m_quadTreeDebugShader = new QuadTreeDebugShader();
 	m_quadTreeDebugShader->use();
-	m_quadTreeDebugShader->setProjectionMatrix(m_projectionMatrix);
+	m_quadTreeDebugShader->setProjectionMatrix(camera->getProjectionMatrix());
 	m_quadTreeDebugShader->unuse();
 
 	m_lights.reserve(AppSettings::MAXLIGHTS());
@@ -108,7 +107,7 @@ void MasterRenderer::render()
 	// Render to framebuffer ( Deferred )
 	glViewport(0, 0, AppSettings::SRCWIDTH(), AppSettings::SRCHEIGHT());
 	m_FBO->bindDeferredFramebuffer();
-	glClearColor(137.f/255.f, 207.f / 255.f, 240.f/255.f, 1.0f);
+	glClearColor(0.f,0.f,0.f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
@@ -126,6 +125,15 @@ void MasterRenderer::render()
 	renderFBO();
 
 	m_lights.clear();
+
+	// Copy over the depthbuffer from the previous passes.
+	glEnable(GL_DEPTH_TEST);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_FBO->gBuffer());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
+	glBlitFramebuffer(
+		0, 0, AppSettings::SRCWIDTH(), AppSettings::SRCHEIGHT(), 0, 0, AppSettings::SRCWIDTH(), AppSettings::SRCHEIGHT(), GL_DEPTH_BUFFER_BIT, GL_NEAREST
+	);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
 }

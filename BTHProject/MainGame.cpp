@@ -22,6 +22,7 @@ MainGame::MainGame()
 	m_entityManager = new EntityManager();
 	m_terrainChunkManager = new TerrainChunkManager();
 	m_lightManager = new LightManager();
+	m_particleManager = new ParticleManager(m_fpsCamera->getProjectionMatrix());
 	m_lightManager->reserveVectorMemory(AppSettings::MAXLIGHTS());
 	m_vSync = true;
 	m_terrainWalk = false;
@@ -50,6 +51,7 @@ MainGame::~MainGame()
 	delete m_terrainChunkManager;
 	delete m_lightManager;
 	delete m_sun;
+	delete m_particleManager;
 }
 
 void MainGame::spawnObjects()
@@ -57,9 +59,7 @@ void MainGame::spawnObjects()
 	// Parse some data
 	ParserData* boxData = m_parser->parseFile("Resources/Models/box.obj");
 	ParserData* treeData = m_parser->parseFile("Resources/Models/tree.obj");
-	
 	ParserData* boatData = m_parser->parseFile("Resources/Models/boat.obj");
-
 
 	// Mesh
 	Mesh* boxMesh = m_loader->createMesh(boxData);
@@ -68,10 +68,6 @@ void MainGame::spawnObjects()
 	// Setup a sun ( Visualized with a box )
 	m_sun = new Entity(boxMesh, glm::vec3(128.f, 16.f, 255.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(0.f, 0.f, 0.f));
 	m_sunMoveSpeed = 10.f;
-	
-	
-	
-	
 	
 	// Setup quadTree and terrain
 	XYZ p(128.f, 12.f, 128.f);
@@ -161,11 +157,27 @@ void MainGame::update(float dt)
 		glfwSwapInterval(0);
 
 	m_masterRenderer->setShadowBiaz(m_shadowBiaz);
+
+	m_particleManager->update(dt);
+
+	m_particleManager->spawnParticle(
+		glm::vec3(90.f, 25.f, 230.f),
+		glm::vec3(RandomNum::single(-5.f, 5.f) / 10.f, 0.2f, RandomNum::single(-5.f, 5.f) / 10.f),
+		1.5f,
+		glm::vec4(
+			RandomNum::single(0.f, 255.f) / 255.f,
+			RandomNum::single(0.f, 255.f) / 255.f,
+			RandomNum::single(0.f, 255.f) / 255.f,
+			1.0f)
+	);
+	
+
 }
 
 void MainGame::render()
 {
 	m_masterRenderer->render();
+	m_particleManager->render(m_activeCamera);
 }
 
 void MainGame::renderImGUI(float dt)
@@ -210,6 +222,7 @@ void MainGame::renderImGUI(float dt)
 		ImGui::Text("Average delta time: %f", dt);
 		ImGui::Text("Entities processed: %i", m_entityManager->entitiesProcessed());
 		ImGui::Text("Lights processed: %i", m_lightManager->getNrOfLightsProcessed());
+		ImGui::Text("Particles: %i", m_particleManager->nrOfParticles());
 		ImGui::Text("Position: (%f, %f, %f)", m_fpsCamera->getPosition().x, m_fpsCamera->getPosition().y, m_fpsCamera->getPosition().z);
 		ImGui::Text("Sun position: (%f, %f, %f)",m_sun->getPosition().x, m_sun->getPosition().y, m_sun->getPosition().z);
 		ImGui::Text("Camera Up: (%f, %f, %f)", m_fpsCamera->getCameraUp().x, m_fpsCamera->getCameraUp().y, m_fpsCamera->getCameraUp().z);

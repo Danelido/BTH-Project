@@ -174,8 +174,10 @@
     <ClCompile Include="Entity\EntityManager.cpp" />
     <ClCompile Include="Light\LightManager.cpp" />
     <ClCompile Include="Graphics\FBO.cpp" />
+    <ClCompile Include="Particle\ParticleManager.cpp" />
     <ClCompile Include="Renderers\TerrainRenderer.cpp" />
     <ClCompile Include="Shader\FBOShader.cpp" />
+    <ClCompile Include="Shader\ParticleShader.cpp" />
     <ClCompile Include="Shader\QuadTreeDebugShader.cpp" />
     <ClCompile Include="Shader\ShadowMapShader.cpp" />
     <ClCompile Include="Shader\TerrainShader.cpp" />
@@ -228,8 +230,10 @@
     <ClInclude Include="Entity\EntityManager.h" />
     <ClInclude Include="Graphics\FBO.h" />
     <ClInclude Include="Light\LightManager.h" />
+    <ClInclude Include="Particle\ParticleManager.h" />
     <ClInclude Include="Renderers\TerrainRenderer.h" />
     <ClInclude Include="Shader\FBOShader.h" />
+    <ClInclude Include="Shader\ParticleShader.h" />
     <ClInclude Include="Shader\QuadTreeDebugShader.h" />
     <ClInclude Include="Shader\ShadowMapShader.h" />
     <ClInclude Include="Shader\TerrainShader.h" />
@@ -275,6 +279,8 @@
     <None Include="Resources\Shaders\FBO.vert" />
     <None Include="Resources\Shaders\InstancedMesh.frag" />
     <None Include="Resources\Shaders\InstancedMesh.vert" />
+    <None Include="Resources\Shaders\Particles.frag" />
+    <None Include="Resources\Shaders\Particles.vert" />
     <None Include="Resources\Shaders\QuadTreeDebug.frag" />
     <None Include="Resources\Shaders\QuadTreeDebug.vert" />
     <None Include="Resources\Shaders\TerrainBackCull.geom" />

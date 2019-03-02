@@ -8,8 +8,8 @@ in vec3 frag_normal;
 in vec2 frag_uv;
 in vec3 frag_objectPos;
 
-layout (location = 4) uniform sampler2D blendMap;
 layout (location = 3) uniform sampler2D backgroundTexture;
+layout (location = 4) uniform sampler2D blendMap;
 layout (location = 5) uniform sampler2D rTexture;
 layout (location = 6) uniform sampler2D gTexture;
 layout (location = 7) uniform sampler2D bTexture;
