@@ -48,9 +48,10 @@ void RegularRenderer::render(const FPSCamera * activeCamera, const FPSCamera* ma
 	for (auto &meshMap : m_meshes)
 	{
 		bindMesh(meshMap.first, mainCamera);
-
+		
 		for (auto entity : meshMap.second)
 		{
+			m_meshShader->setSelected(entity->isSelected());
 			updateModelMatrix(entity);
 			glDrawElements(GL_TRIANGLES, entity->getMesh()->getIndicesSize(), GL_UNSIGNED_INT, NULL);
 		}
@@ -76,28 +77,6 @@ void RegularRenderer::shadowMapPass(ShadowMapShader* shader)
 		glDisableVertexAttribArray(0);
 		glBindVertexArray(NULL);
 	}
-
-	/*
-	if (m_meshes.size() == 0)
-		return;*/
-
-	/*for (auto &meshMap : m_meshes)
-	{
-		glBindVertexArray(meshMap.first->getVao());
-		glEnableVertexAttribArray(0);
-
-		for (auto entity : meshMap.second)
-		{
-			shader->setModelMatrix(entity->getModelMatrix());
-			glDrawElements(GL_TRIANGLES, entity->getMesh()->getIndicesSize(), GL_UNSIGNED_INT, NULL);
-		}
-
-		glDisableVertexAttribArray(0);
-		glBindVertexArray(NULL);
-	}
-
-*/
-
 }
 
 void RegularRenderer::bindMesh(Mesh * mesh, const FPSCamera* camera)
@@ -107,6 +86,7 @@ void RegularRenderer::bindMesh(Mesh * mesh, const FPSCamera* camera)
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 	this->m_meshShader->setCameraPosition(camera->getPosition());
+	this->m_meshShader->setShininess(mesh->getShininess());
 	for (int i = 0; i < mesh->getTexIDs().size(); i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);

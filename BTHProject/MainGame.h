@@ -11,6 +11,8 @@
 #include "Acceleration/QuadTree.h"
 #include "Terrain/TerrainChunkManager.h"
 #include "Particle/ParticleManager.h"
+#include "Utility/MousePicking.h"
+
 
 class MainGame
 {
@@ -39,6 +41,7 @@ private:
 	Terrain* m_terrain;
 	LightManager* m_lightManager;
 	QuadTree* m_quadTree;
+	MousePicking* m_mousePicking;
 
 private:
 	//GPU info

@@ -6,6 +6,8 @@
 #include "Vendor/ImGui/imgui_impl_glfw.h"
 #include "App/AppSettings.h"
 
+#include <iostream>
+
 #define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
 #define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
 
@@ -23,6 +25,7 @@ MainGame::MainGame()
 	m_terrainChunkManager = new TerrainChunkManager();
 	m_lightManager = new LightManager();
 	m_particleManager = new ParticleManager(m_fpsCamera->getProjectionMatrix());
+	m_mousePicking = new MousePicking(m_activeCamera);
 	m_lightManager->reserveVectorMemory(AppSettings::MAXLIGHTS());
 	m_vSync = true;
 	m_terrainWalk = false;
@@ -52,6 +55,7 @@ MainGame::~MainGame()
 	delete m_lightManager;
 	delete m_sun;
 	delete m_particleManager;
+	delete m_mousePicking;
 }
 
 void MainGame::spawnObjects()
@@ -59,11 +63,11 @@ void MainGame::spawnObjects()
 	// Parse some data
 	ParserData* boxData = m_parser->parseFile("Resources/Models/box.obj");
 	ParserData* treeData = m_parser->parseFile("Resources/Models/tree.obj");
-	ParserData* boatData = m_parser->parseFile("Resources/Models/boat.obj");
+	ParserData* sphereData = m_parser->parseFile("Resources/Models/sphere.obj");
 
 	// Mesh
 	Mesh* boxMesh = m_loader->createMesh(boxData);
-	Mesh* boatMesh = m_loader->createMesh(boatData);
+	Mesh* sphereMesh = m_loader->createMesh(sphereData);
 
 	// Setup a sun ( Visualized with a box )
 	m_sun = new Entity(boxMesh, glm::vec3(128.f, 16.f, 255.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(0.f, 0.f, 0.f));
@@ -75,8 +79,8 @@ void MainGame::spawnObjects()
 	m_quadTree = new QuadTree(boundary, m_fpsCamera);
 	m_terrain = new Terrain(m_loader, m_terrainChunkManager, m_quadTree);
 
-	Entity* boat = new Entity(boatMesh, glm::vec3(128.f, 0.f, 225.f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.f, 0.f, 0.f));
-	boat->setBoundaryManually(8.f, 10.f, 10.f);
+	Entity* boat = new Entity(sphereMesh, glm::vec3(128.f, 5.f, 225.f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.f, 0.f, 0.f));
+	//boat->setBoundaryManually(8.f, 10.f, 10.f);
 	m_entityManager->add(boat);
 	m_quadTree->insert(boat);
 	float maxDist = 251;
@@ -131,7 +135,7 @@ void MainGame::spawnObjects()
 	}
 
 }
-
+float t = 0.f;
 void MainGame::update(float dt)
 {
 	if (m_dbgCameraActive){
@@ -160,18 +164,25 @@ void MainGame::update(float dt)
 
 	m_particleManager->update(dt);
 
-	m_particleManager->spawnParticle(
-		glm::vec3(90.f, 25.f, 230.f),
-		glm::vec3(RandomNum::single(-5.f, 5.f) / 10.f, 0.2f, RandomNum::single(-5.f, 5.f) / 10.f),
-		1.5f,
-		glm::vec4(
-			RandomNum::single(0.f, 255.f) / 255.f,
-			RandomNum::single(0.f, 255.f) / 255.f,
-			RandomNum::single(0.f, 255.f) / 255.f,
-			1.0f)
-	);
-	
+	t += dt;
+	if (t >= 0.1f)
+	{
+		t = 0.f;
+		m_particleManager->spawnParticle(
+			glm::vec3(90.f, 25.f, 230.f),
+			glm::vec3(RandomNum::single(-5.f, 5.f) / 10.f, 0.2f, RandomNum::single(-5.f, 5.f) / 10.f),
+			1.5f,
+			glm::vec4(
+				RandomNum::single(0.f, 255.f) / 255.f,
+				RandomNum::single(0.f, 255.f) / 255.f,
+				RandomNum::single(0.f, 255.f) / 255.f,
+				1.0f)
+		);
+	}
 
+	
+	
+	
 }
 
 void MainGame::render()
@@ -257,6 +268,15 @@ void MainGame::queryTreeAndUpdateManagers(float dt)
 	m_entityManager->update(dt, m_activeCamera, m_masterRenderer, objects);
 	m_terrainChunkManager->updateChunks(m_masterRenderer, objects);
 	m_lightManager->update(m_masterRenderer, m_fpsCamera, objects);
+
+	if (Input::isMousePressed(GLFW_MOUSE_BUTTON_1) && !m_activeCamera->isActive())
+	{
+		glm::vec3 ray = m_mousePicking->getRay();
+		m_entityManager->checkMousePicking(m_activeCamera->getPosition(), ray, 200.f, objects);
+		
+		std::cout << "RayDirection: (" << ray.x << ", " << ray.y << ", " << ray.z << ")" << "\n";
+	}
+
 }
 
 void MainGame::jumpFunc(float dt)

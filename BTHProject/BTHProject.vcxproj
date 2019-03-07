@@ -213,6 +213,7 @@
     <ClCompile Include="Renderers\MasterRenderer.cpp" />
     <ClCompile Include="Shader\Shader.cpp" />
     <ClCompile Include="Terrain\Terrain.cpp" />
+    <ClCompile Include="Utility\MousePicking.cpp" />
     <ClCompile Include="Vendor/stb/stb_image.cpp" />
     <ClCompile Include="Vendor\ImGui\imgui.cpp" />
     <ClCompile Include="Vendor\ImGui\imgui_demo.cpp" />
@@ -255,6 +256,7 @@
     <ClInclude Include="Parser\Parser.h" />
     <ClInclude Include="Parser\ParserData.h" />
     <ClInclude Include="Graphics\Quad.h" />
+    <ClInclude Include="Utility\MousePicking.h" />
     <ClInclude Include="Utility\RandomNum.h" />
     <ClInclude Include="Renderers\RegularRenderer.h" />
     <ClInclude Include="Renderers\MasterRenderer.h" />

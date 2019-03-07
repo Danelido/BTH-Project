@@ -225,8 +225,8 @@ void Terrain::generateTerrain()
 	textures.emplace_back("Resources/Textures/granite.png");
 	std::vector<GLuint> textureIDS = m_loader->createTexture(textures);
 	
-	int cellWidth = 8;
-	int cellHeight = 8;
+	int cellWidth = 16;
+	int cellHeight = 16;
 	int cellCount = (m_terrainWidth) / (cellWidth);
 	m_chunkManager->reserveVectorMemory(cellCount * cellCount);
 

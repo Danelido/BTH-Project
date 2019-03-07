@@ -16,6 +16,7 @@ public:
 	void add(Mesh* mesh, const glm::vec3& position, const glm::vec3& scale = glm::vec3(1.f), const glm::vec3& rotation = glm::vec3(0.f));
 	void add(InstancedMesh* instancedMesh, const glm::vec3& position, const glm::vec3& scale = glm::vec3(1.f), const glm::vec3& rotation = glm::vec3(0.f));
 	void registerQuadtree(QuadTree* quadtree);
+	void checkMousePicking(const glm::vec3& cameraPos, const glm::vec3& ray, float maxRayDistance, std::vector<QuadTreeObject*>& objects);
 	void update(float dt, const FPSCamera* camera, MasterRenderer* masterRenderer, std::vector<QuadTreeObject*>& objects);
 	void setIgnoreQuadTree(bool b);
 	const unsigned int& entitiesProcessed() const;

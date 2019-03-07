@@ -13,12 +13,15 @@ public:
 	void setViewMatrix(const glm::mat4& view);
 	void setCameraPosition(const glm::vec3& position);
 	void setProjectionMatrix(const glm::mat4& proj);
+	void setShininess(const float& shininess);
+	void setSelected(const bool& condition);
 private:
 	GLint m_modelMatrixLocation;
 	GLint m_viewMatrixLocation;
 	GLint m_projectionMatrixLocation;
-	GLuint m_cameraPositionLocation;
-
+	GLint m_cameraPositionLocation;
+	GLint m_shininessLocation;
+	GLint m_selectedLocation;
 };
 
 #endif

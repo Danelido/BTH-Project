@@ -12,6 +12,8 @@ MeshShader::MeshShader()
 	m_viewMatrixLocation = glGetUniformLocation(program(), "viewMatrix");
 	m_projectionMatrixLocation = glGetUniformLocation(program(), "projectionMatrix");
 	m_cameraPositionLocation = glGetUniformLocation(program(), "cameraPos");
+	m_shininessLocation = glGetUniformLocation(program(), "shininess");
+	m_selectedLocation = glGetUniformLocation(program(), "selected");
 	unuse();
 }
 
@@ -37,4 +39,17 @@ void MeshShader::setCameraPosition(const glm::vec3 & position)
 void MeshShader::setProjectionMatrix(const glm::mat4 & proj)
 {
 	glUniformMatrix4fv(m_projectionMatrixLocation, 1, GL_FALSE, &proj[0][0]);
+}
+
+void MeshShader::setShininess(const float & shininess)
+{
+	glUniform1f(m_shininessLocation, shininess);
+}
+
+void MeshShader::setSelected(const bool & condition)
+{
+	if (condition)
+		glUniform1i(m_selectedLocation, 1);
+	else
+		glUniform1i(m_selectedLocation, 0);
 }

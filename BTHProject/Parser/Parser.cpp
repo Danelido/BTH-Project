@@ -71,9 +71,9 @@ ParserData * Parser::parseFile(const std::string & filepath)
 		else if (attribs[0] == "f")
 		{
 			std::vector<std::string> attributes = split(line, ' ');
-			for (int i = 0; i < 3; i++)
+			for (int i = 1; i < attributes.size(); i++)
 			{
-				std::vector<std::string> currFace = split(attributes[i + 1], '/');
+				std::vector<std::string> currFace = split(attributes[i], '/');
 				GLuint x = static_cast<GLuint>(std::stoi(currFace[0]));
 				GLuint y = static_cast<GLuint>(std::stoi(currFace[1]));
 				GLuint z = static_cast<GLuint>(std::stoi(currFace[2]));
@@ -147,7 +147,7 @@ bool Parser::parseMTL(const std::string & filename, ParserData* parserData)
 		{
 			parserData->setSpecularColor(std::stof(attribs[1]), std::stof(attribs[2]), std::stof(attribs[3]));
 		}
-		else if (attribs[0] == "Ns")
+		else if (attribs[0] == "Ns" || attribs[0] == "Ni")
 		{
 			parserData->setShininess(std::stof(attribs[1]));
 		}

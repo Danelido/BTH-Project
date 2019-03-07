@@ -5,6 +5,7 @@
 #include <Terrain/TerrainChunk.h>
 #include <Light/Light.h>
 
+
 struct XYZ
 {
 	float x;
@@ -134,6 +135,13 @@ struct AABB
 		return ans;
 	}
 
+	const float getLargestDimension()
+	{
+		float largestDim = glm::max(halfDimensions.x, halfDimensions.y);
+		largestDim = glm::max(largestDim, halfDimensions.z);
+
+		return largestDim;
+	}
 };
 
 

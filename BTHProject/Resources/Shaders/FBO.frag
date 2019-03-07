@@ -59,8 +59,7 @@ void main()
 	vec3 position = texture(gPosition,frag_uv).rgb;
 	vec3 normal = texture(gNormal,frag_uv).rgb;
 	vec3 albedo = texture(gAlbedoSpec,frag_uv).rgb;
-	float specularStrength = texture(gAlbedoSpec,frag_uv).a; 
-	specularStrength = 0.5f;
+	float specularStrength = texture(gAlbedoSpec,frag_uv).a;
 	
 	// Get shadow value
 	vec4 lightFragPosition = lightTransform * vec4(position, 1.0);

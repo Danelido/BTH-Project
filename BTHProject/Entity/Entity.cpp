@@ -4,7 +4,8 @@
 #include "App/AppSettings.h"
 
 Entity::Entity(Mesh* mesh, const glm::vec3& position, const glm::vec3& scale, const glm::vec3& rotation) :
-	m_instancedMesh(nullptr), m_mesh(mesh), m_position(position), m_scale(scale), m_rotation(rotation), m_isInstanced(false)
+	m_instancedMesh(nullptr), m_mesh(mesh), m_position(position), m_scale(scale), m_rotation(rotation), m_isInstanced(false),
+	m_selected(false)
 {
 	m_boundary = new AABB();
 	updateBoundary();
@@ -12,7 +13,8 @@ Entity::Entity(Mesh* mesh, const glm::vec3& position, const glm::vec3& scale, co
 }
 
 Entity::Entity(InstancedMesh * instancedMesh, const glm::vec3 & position, const glm::vec3 & scale, const glm::vec3 & rotation) :
-	m_instancedMesh(instancedMesh), m_mesh(nullptr), m_position(position), m_scale(scale), m_rotation(rotation), m_isInstanced(true)
+	m_instancedMesh(instancedMesh), m_mesh(nullptr), m_position(position), m_scale(scale), m_rotation(rotation), m_isInstanced(true),
+	m_selected(false)
 {
 	m_boundary = new AABB();
 	updateBoundary();
@@ -66,6 +68,11 @@ void Entity::setBoundaryManually(float width, float height, float depth)
 	m_boundary->center.z = m_position.z;
 
 	updateBoundary();
+}
+
+void Entity::setSelected(bool condition)
+{
+	m_selected = condition;
 }
 
 void Entity::updateBoundary()
@@ -271,6 +278,11 @@ const glm::mat4 & Entity::getModelMatrix() const
 const bool & Entity::isInstanced() const
 {
 	return m_isInstanced;
+}
+
+const bool & Entity::isSelected() const
+{
+	return m_selected;
 }
 
  AABB& Entity::getBoundary() const

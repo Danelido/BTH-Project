@@ -17,6 +17,7 @@ public:
 	void setRotation(const glm::vec3& rotation);
 	void setScale(const glm::vec3& scale);
 	void setBoundaryManually(float width, float height, float depth);
+	void setSelected(bool condition);
 	void updateBoundary();
 	GLuint getDebugVAO();
 	const glm::vec3& getPosition() const;
@@ -24,6 +25,7 @@ public:
 	const glm::vec3& getScale() const;
 	const glm::mat4& getModelMatrix() const;
 	const bool& isInstanced() const;
+	const bool& isSelected() const;
 	AABB& getBoundary() const;
 	Mesh* getMesh();
 	InstancedMesh* getInstancedMesh();
@@ -40,6 +42,7 @@ private:
 	void updateModelMatrix();
 
 	// DEBUG
+	bool m_selected;
 	GLuint m_vao = 0;
 	GLuint m_vbo = 0;
 	bool m_hasBeenSetUp = false;
