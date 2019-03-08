@@ -15,9 +15,9 @@ MainGame::MainGame()
 {
 	m_parser = new Parser();
 	m_loader = new Loader();
-	m_fpsCamera = new FPSCamera(glm::vec3(128.0f, 15.0f, 128.f));
+	m_fpsCamera = new FPSCamera(glm::vec3(10.f, 3.0f, 50.f));
 	m_fpsCamera->initDebugMode();
-	m_dbgCamera = new FPSCamera(glm::vec3(128.0f, 15.0f, 128.f));
+	m_dbgCamera = new FPSCamera(glm::vec3(10.f, 3.0f, 50.f));
 	m_dbgCameraActive = false;
 	m_activeCamera = m_fpsCamera;
 	m_masterRenderer = new MasterRenderer(m_activeCamera);
@@ -28,13 +28,12 @@ MainGame::MainGame()
 	m_mousePicking = new MousePicking(m_activeCamera);
 	m_lightManager->reserveVectorMemory(AppSettings::MAXLIGHTS());
 	m_vSync = true;
-	m_terrainWalk = false;
+	m_terrainWalk = true;
 	m_gravity = -20.f;
 	m_upAcceleration = 0.f;
 	m_jumpForce = 9.0f;
 	m_canJump = true;
 	m_ignoreQuadtree = false;
-	m_shadowBiaz = 0.005f;
 	spawnObjects();
 	
 	m_entityManager->registerQuadtree(m_quadTree);
@@ -62,7 +61,6 @@ void MainGame::spawnObjects()
 {
 	// Parse some data
 	ParserData* boxData = m_parser->parseFile("Resources/Models/box.obj");
-	ParserData* treeData = m_parser->parseFile("Resources/Models/tree.obj");
 	ParserData* sphereData = m_parser->parseFile("Resources/Models/sphere.obj");
 
 	// Mesh
@@ -70,24 +68,23 @@ void MainGame::spawnObjects()
 	Mesh* sphereMesh = m_loader->createMesh(sphereData);
 
 	// Setup a sun ( Visualized with a box )
-	m_sun = new Entity(boxMesh, glm::vec3(128.f, 16.f, 255.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(0.f, 0.f, 0.f));
+	m_sun = new Entity(boxMesh, glm::vec3(24.f, 10.f, 66.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(0.f, 0.f, 0.f));
 	m_sunMoveSpeed = 10.f;
 	
 	// Setup quadTree and terrain
-	XYZ p(128.f, 12.f, 128.f);
-	AABB boundary(p, 128.f);
+	XYZ p(32.f, 6.f, 32.f);
+	AABB boundary(p, 32.f);
 	m_quadTree = new QuadTree(boundary, m_fpsCamera);
 	m_terrain = new Terrain(m_loader, m_terrainChunkManager, m_quadTree);
 
-	Entity* boat = new Entity(sphereMesh, glm::vec3(128.f, 5.f, 225.f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.f, 0.f, 0.f));
-	//boat->setBoundaryManually(8.f, 10.f, 10.f);
-	m_entityManager->add(boat);
-	m_quadTree->insert(boat);
-	float maxDist = 251;
+	Entity* sphere = new Entity(sphereMesh, glm::vec3(25.f, 5.f, 50.f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.f, 0.f, 0.f));
+	m_entityManager->add(sphere);
+	m_quadTree->insert(sphere);
+	float maxDist = 64;
 
 	// Entites in the shadow mapping area	
 	Entity* entity1 = new Entity(boxMesh,
-		glm::vec3(123.f, 2.5f, 250.f),
+		glm::vec3(26.f, 2.5f, 55.f),
 		glm::vec3(1.f, 1.f, 1.f),
 		glm::vec3(25.f, 0.f, 60.f));
 	m_entityManager->add(entity1);
@@ -95,7 +92,7 @@ void MainGame::spawnObjects()
 	
 
 	Entity* entity2 = new Entity(boxMesh,
-		glm::vec3(133.f, 3.f, 250.f),
+		glm::vec3(22.f, 3.f, 55.f),
 		glm::vec3(1.2f, 0.75f, 1.f),
 		glm::vec3(25.f, 150.f, 60.f));
 	m_entityManager->add(entity2);
@@ -103,7 +100,7 @@ void MainGame::spawnObjects()
 
 
 	Entity* entity3 = new Entity(boxMesh,
-		glm::vec3(123.f, 2.5f, 245.f),
+		glm::vec3(22.f, 2.5f, 50.f),
 		glm::vec3(0.3f, 1.2f, 1.3f),
 		glm::vec3(125.f, 10.f, 160.f));
 	m_entityManager->add(entity3);
@@ -111,7 +108,7 @@ void MainGame::spawnObjects()
 
 
 	Entity* entity4 = new Entity(boxMesh,
-		glm::vec3(133.f, 1.5f, 248.f),
+		glm::vec3(26.f, 1.5f, 50.f),
 		glm::vec3(.5f, .5f, .5f),
 		glm::vec3(50.f, 60.f, 110.f));
 	m_entityManager->add(entity4);
@@ -119,7 +116,7 @@ void MainGame::spawnObjects()
 	//-------------------------------------------
 
 	//Lights
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 15; i++)
 	{
 		float x = RandomNum::single(5.f, maxDist);
 		float z = RandomNum::single(5.f, maxDist);
@@ -128,7 +125,7 @@ void MainGame::spawnObjects()
 		Light* light = new Light(
 			glm::vec3(x,y,z),
 			RandomNum::vec3(0.f, 255.f, 0.f, 255.f, 0.f, 255.f) / 255.f,
-			8.f);
+			4.f);
 
 		m_lightManager->addLight(light);
 		m_quadTree->insert(light);
@@ -160,18 +157,16 @@ void MainGame::update(float dt)
 	else
 		glfwSwapInterval(0);
 
-	m_masterRenderer->setShadowBiaz(m_shadowBiaz);
-
 	m_particleManager->update(dt);
 
 	t += dt;
-	if (t >= 0.1f)
+	if (t >= 0.2f)
 	{
 		t = 0.f;
 		m_particleManager->spawnParticle(
-			glm::vec3(90.f, 25.f, 230.f),
-			glm::vec3(RandomNum::single(-5.f, 5.f) / 10.f, 0.2f, RandomNum::single(-5.f, 5.f) / 10.f),
-			1.5f,
+			glm::vec3(47.f, 7.f, 22.f),
+			glm::vec3(RandomNum::single(-5.f, 5.f) / 50.f, 0.2f, RandomNum::single(-5.f, 5.f) / 50.f),
+			2.5f,
 			glm::vec4(
 				RandomNum::single(0.f, 255.f) / 255.f,
 				RandomNum::single(0.f, 255.f) / 255.f,
@@ -250,7 +245,6 @@ void MainGame::renderImGUI(float dt)
 		ImGui::Checkbox("Ignore quadtree", &m_ignoreQuadtree);
 		ImGui::SliderFloat("JumpForce", &m_jumpForce, 0.00f, 20.0f);
 		ImGui::SliderFloat("Gravity", &m_gravity, -20.f, 0.f);
-		ImGui::SliderFloat("Shadow biaz", &m_shadowBiaz, 0.0001f, 1.0f);
 	}
 	ImGui::End();
 
@@ -273,8 +267,7 @@ void MainGame::queryTreeAndUpdateManagers(float dt)
 	{
 		glm::vec3 ray = m_mousePicking->getRay();
 		m_entityManager->checkMousePicking(m_activeCamera->getPosition(), ray, 200.f, objects);
-		
-		std::cout << "RayDirection: (" << ray.x << ", " << ray.y << ", " << ray.z << ")" << "\n";
+		//std::cout << "RayDirection: (" << ray.x << ", " << ray.y << ", " << ray.z << ")" << "\n";
 	}
 
 }

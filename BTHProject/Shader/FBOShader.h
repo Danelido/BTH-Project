@@ -15,13 +15,11 @@ public:
 	void setSunPosition(const glm::vec3& position);
 	void registerLights(const std::vector<Light*>* lights);
 	void setLightTransform(const glm::mat4& lightTransform);
-	void setShadowBiaz(const float& biaz);
 private:
 	GLint m_cameraPositionLocation;
 	GLint m_numberOfLightsLocation;
 	GLint m_sunPositionLocation;
 	GLint m_lightTransformLocation;
-	GLint m_shadowBiazLocation;
 
 	struct lightShaderProperties
 	{

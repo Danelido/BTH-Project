@@ -8,13 +8,13 @@ Terrain::Terrain(Loader* loader, TerrainChunkManager* chunkManager, QuadTree* qu
 	m_loader = loader;
 	m_quadTree = quadtree;
 	m_chunkManager = chunkManager;
-	m_terrainWidth = 256;
-	m_terrainHeight = 256;
+	m_terrainWidth = 64;
+	m_terrainHeight = 64;
 	m_modelMatrix = MatrixCreator::createNewModelMatrix(glm::vec3(0.f, -1.f, 0.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 1.f));
 	m_size = 1.f;
-	m_heightScaleDivider = 14;
+	m_heightScaleDivider = 32;
 	GLint width, height, channels;
-	const char* filename = "Resources/Textures/heightmap.png";
+	const char* filename = "Resources/Textures/hmap.png";
 	stbi_set_flip_vertically_on_load(0);
 	unsigned char* textureData = stbi_load(filename, &width, &height, &channels, STBI_rgb);
 
@@ -47,7 +47,7 @@ float Terrain::getHeight(const glm::vec3& position)
 		int x = static_cast<int>(((float)position.x / m_terrainWidth) * m_terrainWidth);
 		int z = static_cast<int>((1.f - (position.z / m_terrainWidth)) * m_terrainWidth);
 		float y = m_heightmapCoords[x + (z * m_terrainWidth)].y;
-		return (y + .5f); // 0.5f offset to make it a little bit above ground
+		return (y); // 0.5f offset to make it a little bit above ground
 
 	}
 	return 0.f;
@@ -218,15 +218,15 @@ void Terrain::generateTerrain()
 	}
 
 	std::vector<std::string> textures;
-	textures.emplace_back("Resources/Textures/blendmap.png");
+	textures.emplace_back("Resources/Textures/bmap.png");
 	textures.emplace_back("Resources/Textures/grass.png");
 	textures.emplace_back("Resources/Textures/muddy.png");
 	textures.emplace_back("Resources/Textures/stone.png");
 	textures.emplace_back("Resources/Textures/granite.png");
 	std::vector<GLuint> textureIDS = m_loader->createTexture(textures);
 	
-	int cellWidth = 16;
-	int cellHeight = 16;
+	int cellWidth = 8;
+	int cellHeight = 8;
 	int cellCount = (m_terrainWidth) / (cellWidth);
 	m_chunkManager->reserveVectorMemory(cellCount * cellCount);
 

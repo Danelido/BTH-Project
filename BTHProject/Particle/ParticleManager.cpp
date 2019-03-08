@@ -38,7 +38,7 @@ void ParticleManager::update(float dt)
 		}
 
 		// If not dead, then update position 
-		p.spawnVelocity += glm::vec3(0.f, -1.2f, 0.f) * dt;
+		p.spawnVelocity += glm::vec3(0.f, -.3f, 0.f) * dt;
 		p.position += p.spawnVelocity;
 		p.color.a = p.lifetime / p.initialLifetime;
 		m_centerVector.push_back(p.position);

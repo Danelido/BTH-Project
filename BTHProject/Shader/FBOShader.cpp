@@ -12,8 +12,7 @@ FBOShader::FBOShader()
 	m_numberOfLightsLocation = glGetUniformLocation(program(), "nrOfLights");
 	m_sunPositionLocation = glGetUniformLocation(program(), "sunPosition");
 	m_lightTransformLocation = glGetUniformLocation(program(), "lightTransform");
-	m_shadowBiazLocation = glGetUniformLocation(program(), "shadowBiaz");
-
+	
 	for (int i = 0; i < AppSettings::MAXLIGHTS(); i++)
 	{
 		std::string posLoc = "lights[" + std::to_string(i) + "].position";
@@ -77,9 +76,4 @@ void FBOShader::registerLights(const std::vector<Light*>* lights)
 void FBOShader::setLightTransform(const glm::mat4 & lightTransform)
 {
 	glUniformMatrix4fv(m_lightTransformLocation, 1, GL_FALSE, &lightTransform[0][0]);
-}
-
-void FBOShader::setShadowBiaz(const float & biaz)
-{
-	glUniform1f(m_shadowBiazLocation, biaz);
 }

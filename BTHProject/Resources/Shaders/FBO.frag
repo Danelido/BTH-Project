@@ -21,7 +21,6 @@ uniform Light lights[MAX_LIGHTS];
 uniform vec3 cameraPos;
 uniform mat4 lightTransform;
 uniform vec3 sunPosition;
-uniform float shadowBiaz;
 
 vec3 sunColor = vec3(0.9f,0.9f,0.9f);
 
@@ -45,7 +44,7 @@ float shadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 fragPos)
 	
 	// Make the bias depend on the angle to the light
 	vec3 lightDir = normalize(sunPosition - fragPos);
-	float bias = max(shadowBiaz * (1.0 - dot(normal,lightDir)), 0.005f);  
+	float bias = max(0.005f * (1.0 - dot(normal,lightDir)), 0.005f);  
 
 	// check whether current frag pos is in shadow
 	float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;

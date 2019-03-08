@@ -31,7 +31,6 @@ public:
 	void registerQuadTree(QuadTree* quadTree);
 	void passAllEntitiesForShadowMapping(std::vector<Entity*>* allEntities);
 	void setSunPosition(const glm::vec3& position);
-	void setShadowBiaz(const float& biaz);
 	void render();
 	void changeCamera(FPSCamera * camera);
 	
@@ -48,7 +47,6 @@ private:
 	FBO* m_FBO;
 	Quad* m_fboQuad;
 	
-	float m_shadowBiaz;
 	glm::vec3 m_sunDirection;
 	FPSCamera* m_camera;
 	FPSCamera* m_activeCamera;

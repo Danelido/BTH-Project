@@ -31,7 +31,7 @@ MasterRenderer::MasterRenderer(FPSCamera* camera)
 	m_lights.reserve(AppSettings::MAXLIGHTS());
 
 	m_lightProj = glm::ortho(-10.f, 10.f, -10.f, 10.f, -1.0f, 30.f);
-	m_sunDirection = glm::vec3(128.f, 0.f, 250.f);
+	m_sunDirection = glm::vec3(24.f, 0.f, 43.f);
 	m_shadowMapShader = new ShadowMapShader();
 
 }
@@ -150,7 +150,6 @@ void MasterRenderer::renderFBO()
 
 	m_fboShader->use();
 	m_FBO->bindDeferredTextures();
-	m_fboShader->setShadowBiaz(m_shadowBiaz);
 	m_fboShader->registerLights(&m_lights);
 	m_fboShader->setSunPosition(m_sunPosition);
 	m_fboShader->setCameraPosition(m_activeCamera->getPosition());
@@ -180,8 +179,4 @@ void MasterRenderer::setSunPosition(const glm::vec3& position)
 	m_sunPosition = position;
 }
 
-void MasterRenderer::setShadowBiaz(const float & biaz)
-{
-	this->m_shadowBiaz = biaz;
-}
 
