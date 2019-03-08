@@ -25,7 +25,7 @@ private:
 	void createShadowMappingBuffers();
 	void genRenderBuffer();
 	
-	GLuint m_fbo;
+	GLuint m_gBuffer;
 	GLuint m_shadowFbo;
 	GLuint m_texColorBuffer;
 	GLuint m_texDepthBuffer;

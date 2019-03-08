@@ -266,7 +266,7 @@ void MainGame::queryTreeAndUpdateManagers(float dt)
 	if (Input::isMousePressed(GLFW_MOUSE_BUTTON_1) && !m_activeCamera->isActive())
 	{
 		glm::vec3 ray = m_mousePicking->getRay();
-		m_entityManager->checkMousePicking(m_activeCamera->getPosition(), ray, 200.f, objects);
+		m_entityManager->checkMousePicking(m_activeCamera->getPosition(), ray, objects);
 		//std::cout << "RayDirection: (" << ray.x << ", " << ray.y << ", " << ray.z << ")" << "\n";
 	}
 

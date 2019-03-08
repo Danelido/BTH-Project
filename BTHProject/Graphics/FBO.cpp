@@ -13,8 +13,8 @@ FBO::~FBO()
 void FBO::genFrameBuffer()
 {
 	// Deferred
-	glGenFramebuffers(1, &m_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glGenFramebuffers(1, &m_gBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer);
 	createDeferredShadingBuffers();
 	genRenderBuffer();
 
@@ -48,7 +48,7 @@ void FBO::unbindShadowFramebuffer()
 
 void FBO::bindDeferredFramebuffer()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer);
 }
 
 void FBO::unbindDeferredFramebuffer()
@@ -58,7 +58,7 @@ void FBO::unbindDeferredFramebuffer()
 
 const GLuint FBO::gBuffer() const
 {
-	return m_fbo;
+	return m_gBuffer;
 }
 
 void FBO::bindDeferredTextures()

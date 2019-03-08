@@ -39,7 +39,7 @@ void EntityManager::registerQuadtree(QuadTree * quadtree)
 	m_quadtree = quadtree;
 }
 
-void EntityManager::checkMousePicking(const glm::vec3 & cameraPos, const glm::vec3 & ray, float maxRayDistance, std::vector<QuadTreeObject*>& objects)
+void EntityManager::checkMousePicking(const glm::vec3 & cameraPos, const glm::vec3 & ray, std::vector<QuadTreeObject*>& objects)
 {
 	if (m_quadtree != nullptr && !m_ignoreQuadTree)
 	{
