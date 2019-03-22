@@ -223,7 +223,9 @@ void MainGame::renderImGUI(float dt)
 		ImGui::TextColored(ImVec4(204.f / 255.f, 102.f / 255.f, 0.f, 1.0f),
 			"Total GPU Memory: %i%s\n%s%i%s\n%s%i%s", m_total_mem_kb / 1024, " MB", "Available GPU Memory: ", m_cur_avail_mem_kb / 1024, " MB",
 			"Used GPU Memory: ", (m_total_mem_kb / 1024) - (m_cur_avail_mem_kb / 1024), " MB");
-
+		ImGui::Text("C = Lock/Unlock camera");
+		ImGui::Text("WASD = Move around");
+		ImGui::Text("Space & CTRL = Move Up/Down");
 		ImGui::Text("Frame average %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
 		ImGui::Text("Average delta time: %f", dt);
 		ImGui::Text("Entities processed: %i", m_entityManager->entitiesProcessed());
@@ -232,9 +234,6 @@ void MainGame::renderImGUI(float dt)
 		ImGui::Text("Position: (%f, %f, %f)", m_fpsCamera->getPosition().x, m_fpsCamera->getPosition().y, m_fpsCamera->getPosition().z);
 		ImGui::Text("Sun position: (%f, %f, %f)",m_sun->getPosition().x, m_sun->getPosition().y, m_sun->getPosition().z);
 		ImGui::Text("Camera Up: (%f, %f, %f)", m_fpsCamera->getCameraUp().x, m_fpsCamera->getCameraUp().y, m_fpsCamera->getCameraUp().z);
-		ImGui::Text("C = Lock/Unlock camera");
-		ImGui::Text("WASD = Move around");
-		ImGui::Text("Space & CTRL = Move Up/Down");
 	}
 
 	if (m_controlsTab) 

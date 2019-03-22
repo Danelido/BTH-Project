@@ -32,5 +32,5 @@ void main()
 	gPosition = frag_objectPos;	
 	gNormal = normalize(frag_normal);
 	gAlbedoSpec.rgb = color.rgb;
-	gAlbedoSpec.a = 0.0f;  // Read from specular texture here when you have one ( The r value )
+	gAlbedoSpec.a = 0.0f;  // No specular factor
 }
